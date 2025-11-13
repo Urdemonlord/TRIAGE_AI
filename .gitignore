@@ -103,6 +103,10 @@ target/
 *.sqlite3
 dump.rdb
 *.rdb
+*.csv
+DATABASE/dataset/
+DATABASE/dataset/**
+!DATABASE/createdb.sql
 
 # =============================================================================
 # DOCUMENTATION BUILDS
