@@ -3,13 +3,27 @@ import { createClient } from '@supabase/supabase-js';
 const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
 const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
 
-if (!supabaseUrl || !supabaseAnonKey) {
+// Create client with fallback for build time
+let supabase: any = null;
+
+if (supabaseUrl && supabaseAnonKey) {
+  supabase = createClient(supabaseUrl, supabaseAnonKey);
+} else if (typeof window !== 'undefined') {
+  // Only throw error in browser, not during SSR/build
   throw new Error(
-    'Missing Supabase environment variables. Please check your .env.local file.'
+    'Missing Supabase environment variables. Please check your environment configuration.'
   );
 }
 
-export const supabase = createClient(supabaseUrl, supabaseAnonKey);
+export const getSupabaseClient = () => {
+  if (!supabase && typeof window !== 'undefined') {
+    throw new Error('Supabase is not properly initialized. Missing environment variables.');
+  }
+  return supabase;
+};
+
+// Default export for backward compatibility
+export { supabase };
 
 // Auth helpers
 export const authService = {
