@@ -1,17 +1,30 @@
-# Environment variables
+# =============================================================================
+# ENVIRONMENT & SECRETS
+# =============================================================================
 .env
 .env.local
 .env.*.local
+.env.production.local
+*.pem
+*.key
+.DS_Store
 
-# Python
-__pycache__/
-*.py[cod]
-*$py.class
-*.so
-.Python
+# =============================================================================
+# PYTHON VIRTUAL ENVIRONMENTS
+# =============================================================================
 env/
 venv/
 ENV/
+env.bak/
+venv.bak/
+.venv
+.venv/
+python-env/
+.python-version
+
+# =============================================================================
+# PYTHON BUILD & DIST
+# =============================================================================
 build/
 develop-eggs/
 dist/
@@ -27,58 +40,148 @@ wheels/
 *.egg-info/
 .installed.cfg
 *.egg
+MANIFEST
+pip-wheel-metadata/
 
-# Virtual environments
-.venv
-pip-log.txt
-pip-delete-this-directory.txt
+# =============================================================================
+# PYTHON CACHE & COMPILED
+# =============================================================================
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+*.c
+*.so
 
-# IDE & Editor
+# =============================================================================
+# MACHINE LEARNING & DATA FILES
+# =============================================================================
+*.pkl
+*.pickle
+*.joblib
+*.h5
+*.model
+*.pt
+*.pth
+*.onnx
+trained_model/
+models/trained/
+data/raw/
+data/processed/
+*.csv
+!app/data/symptoms_dataset.csv
+!app/data/red_flags_rules.json
+
+# =============================================================================
+# IDE & EDITOR
+# =============================================================================
 .vscode/
 .idea/
+*.sublime-project
+*.sublime-workspace
 *.swp
 *.swo
 *~
-.DS_Store
-Thumbs.db
-*.sublime-project
-*.sublime-workspace
+.vim
+.emacs
+.editorconfig.local
 
-# OS
+# =============================================================================
+# TESTING & COVERAGE
+# =============================================================================
+coverage/
+.nyc_output/
+.coverage
+htmlcov/
+.pytest_cache/
+.tox/
+.hypothesis/
+*.cover
+.coverage.*
+.cache/
+nosetests.xml
+coverage.xml
+*.cover
+
+# =============================================================================
+# LOGS
+# =============================================================================
+logs/
+*.log
+npm-debug.log*
+npm-error.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+pip-log.txt
+pip-delete-this-directory.txt
+
+# =============================================================================
+# JUPYTER & NOTEBOOKS
+# =============================================================================
+.ipynb_checkpoints
+*.ipynb_checkpoints
+*.nb.html
+.jupyter
+
+# =============================================================================
+# FASTAPI & UVICORN
+# =============================================================================
+.uvicorn_cache/
+uvicorn.log
+uvicorn-*.log
+
+# =============================================================================
+# REDIS & CACHE
+# =============================================================================
+dump.rdb
+*.rdb
+redis_cache/
+.cache/
+
+# =============================================================================
+# OS FILES
+# =============================================================================
 .DS_Store
 .DS_Store?
 ._*
 .Spotlight-V100
 .Trashes
 ehthumbs.db
+Thumbs.db
 desktop.ini
+.AppleDouble
+.LSOverride
+$RECYCLE.BIN/
 
-# Logs
-logs/
-*.log
-npm-debug.log*
-yarn-debug.log*
-yarn-error.log*
+# =============================================================================
+# SYSTEM & TEMP
+# =============================================================================
+*.tmp
+*.temp
+*.bak
+*.backup
+~*
+.~*
+*.swn
+*.orig
+*.rej
 
-# Testing
-coverage/
-.nyc_output/
-.pytest_cache/
-htmlcov/
+# =============================================================================
+# DOCKER
+# =============================================================================
+.dockerignore
+docker-compose.override.yml
+.docker/
+docker-compose.dev.yml
 
-# Data files
-*.pkl
-*.pickle
-*.joblib
-*.csv
-trained_model/
-*.h5
-*.model
-
-# Misc
-.cache/
+# =============================================================================
+# IDE GENERATED
+# =============================================================================
 .mypy_cache/
 .dmypy.json
 dmypy.json
-*.pem
 .ruff_cache/
+.pylint.d/
+.pylama.d/
