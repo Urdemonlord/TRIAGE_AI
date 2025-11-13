@@ -1,0 +1,224 @@
+{
+  "critical_red_flags": [
+    {
+      "keywords": ["nyeri dada menjalar", "nyeri dada ke lengan", "chest pain radiation"],
+      "urgency": "Red",
+      "reason": "Suspek infark miokard / serangan jantung",
+      "action": "Segera ke IGD"
+    },
+    {
+      "keywords": ["sesak napas", "napas berat", "sulit bernapas", "napas pendek"],
+      "urgency": "Red",
+      "reason": "Gangguan pernapasan akut",
+      "action": "Segera ke IGD"
+    },
+    {
+      "keywords": ["stroke", "bicara pelo", "wajah mencong", "lemah sebelah", "kelemahan satu sisi"],
+      "urgency": "Red",
+      "reason": "Suspek stroke",
+      "action": "Segera ke IGD (golden period 4.5 jam)"
+    },
+    {
+      "keywords": ["kejang", "kejang demam"],
+      "urgency": "Red",
+      "reason": "Kejang memerlukan penanganan segera",
+      "action": "Segera ke IGD"
+    },
+    {
+      "keywords": ["pingsan", "tidak sadar", "penurunan kesadaran"],
+      "urgency": "Red",
+      "reason": "Gangguan kesadaran",
+      "action": "Segera ke IGD"
+    },
+    {
+      "keywords": ["batuk berdarah", "muntah darah", "BAB berdarah", "kencing berdarah"],
+      "urgency": "Red",
+      "reason": "Perdarahan sistem organ",
+      "action": "Segera ke IGD"
+    },
+    {
+      "keywords": ["diare berdarah", "mencret berdarah"],
+      "urgency": "Red",
+      "reason": "Perdarahan saluran cerna",
+      "action": "Segera ke dokter / IGD"
+    },
+    {
+      "keywords": ["leher kaku", "kaku kuduk"],
+      "urgency": "Red",
+      "reason": "Suspek meningitis",
+      "action": "Segera ke IGD"
+    },
+    {
+      "keywords": ["mata kuning", "jaundice", "kuning"],
+      "urgency": "Red",
+      "reason": "Gangguan fungsi hati",
+      "action": "Segera ke dokter"
+    },
+    {
+      "keywords": ["bengkak wajah", "bengkak mata", "bengkak bibir", "sulit bernapas alergi"],
+      "urgency": "Red",
+      "reason": "Suspek reaksi alergi berat (anafilaksis)",
+      "action": "Segera ke IGD"
+    },
+    {
+      "keywords": ["tidak bisa menelan", "drooling", "air liur keluar terus"],
+      "urgency": "Red",
+      "reason": "Obstruksi saluran napas atas",
+      "action": "Segera ke IGD"
+    },
+    {
+      "keywords": ["bunuh diri", "ingin mati", "ide bunuh diri"],
+      "urgency": "Red",
+      "reason": "Risiko bunuh diri",
+      "action": "Segera konsultasi psikiater / IGD"
+    },
+    {
+      "keywords": ["perdarahan kehamilan", "hamil berdarah"],
+      "urgency": "Red",
+      "reason": "Komplikasi kehamilan",
+      "action": "Segera ke IGD Obstetri"
+    },
+    {
+      "keywords": ["dehidrasi berat", "bayi lemas", "tidak mau minum"],
+      "urgency": "Red",
+      "reason": "Dehidrasi berat pada bayi/anak",
+      "action": "Segera ke IGD"
+    },
+    {
+      "keywords": ["trauma kepala", "benturan kepala", "jatuh kepala"],
+      "urgency": "Red",
+      "reason": "Risiko perdarahan intrakranial",
+      "action": "Segera ke IGD"
+    },
+    {
+      "keywords": ["fraktur", "patah tulang", "tulang patah"],
+      "urgency": "Red",
+      "reason": "Fraktur memerlukan penanganan segera",
+      "action": "Segera ke IGD"
+    }
+  ],
+  "warning_yellow_flags": [
+    {
+      "keywords": ["demam tinggi", "demam 39", "demam 40", "panas tinggi"],
+      "urgency": "Yellow",
+      "reason": "Demam tinggi perlu evaluasi",
+      "action": "Konsultasi dokter dalam 24 jam"
+    },
+    {
+      "keywords": ["demam lama", "demam 5 hari", "demam seminggu", "panas terus"],
+      "urgency": "Yellow",
+      "reason": "Demam berkepanjangan",
+      "action": "Konsultasi dokter"
+    },
+    {
+      "keywords": ["sakit kepala hebat", "kepala sangat sakit"],
+      "urgency": "Yellow",
+      "reason": "Nyeri kepala berat",
+      "action": "Konsultasi dokter"
+    },
+    {
+      "keywords": ["nyeri perut hebat", "sakit perut hebat"],
+      "urgency": "Yellow",
+      "reason": "Nyeri abdomen akut",
+      "action": "Evaluasi dokter segera"
+    },
+    {
+      "keywords": ["muntah terus", "muntah tidak berhenti"],
+      "urgency": "Yellow",
+      "reason": "Risiko dehidrasi",
+      "action": "Konsultasi dokter"
+    },
+    {
+      "keywords": ["luka tidak sembuh", "luka lama"],
+      "urgency": "Yellow",
+      "reason": "Luka kronis perlu evaluasi",
+      "action": "Konsultasi dokter"
+    },
+    {
+      "keywords": ["batuk lama", "batuk 2 minggu", "batuk berkepanjangan"],
+      "urgency": "Yellow",
+      "reason": "Batuk kronis perlu pemeriksaan",
+      "action": "Konsultasi dokter"
+    },
+    {
+      "keywords": ["penurunan berat badan", "berat badan turun drastis"],
+      "urgency": "Yellow",
+      "reason": "Penurunan berat badan tidak wajar",
+      "action": "Konsultasi dokter"
+    },
+    {
+      "keywords": ["gula darah tinggi", "hiperglikemia", "gula 400"],
+      "urgency": "Yellow",
+      "reason": "Hiperglikemia perlu penanganan",
+      "action": "Konsultasi dokter"
+    },
+    {
+      "keywords": ["hipertensi emergency", "tekanan darah 200", "tensi tinggi sekali"],
+      "urgency": "Red",
+      "reason": "Krisis hipertensi",
+      "action": "Segera ke IGD"
+    },
+    {
+      "keywords": ["pandangan kabur", "mata kabur", "penglihatan kabur"],
+      "urgency": "Yellow",
+      "reason": "Gangguan penglihatan",
+      "action": "Konsultasi dokter mata"
+    },
+    {
+      "keywords": ["vertigo", "pusing berputar"],
+      "urgency": "Yellow",
+      "reason": "Vertigo perlu evaluasi",
+      "action": "Konsultasi dokter"
+    },
+    {
+      "keywords": ["mengi", "napas bunyi", "wheezing"],
+      "urgency": "Yellow",
+      "reason": "Gangguan saluran napas",
+      "action": "Konsultasi dokter"
+    },
+    {
+      "keywords": ["alergi", "reaksi alergi"],
+      "urgency": "Yellow",
+      "reason": "Reaksi alergi",
+      "action": "Monitor, konsultasi jika memburuk"
+    },
+    {
+      "keywords": ["luka bakar"],
+      "urgency": "Yellow",
+      "reason": "Luka bakar perlu evaluasi",
+      "action": "Ke dokter / IGD tergantung luas"
+    }
+  ],
+  "green_flags": [
+    {
+      "keywords": ["flu biasa", "pilek", "hidung meler"],
+      "urgency": "Green",
+      "reason": "Gejala common cold",
+      "action": "Istirahat, minum banyak, observasi"
+    },
+    {
+      "keywords": ["batuk ringan", "batuk pilek"],
+      "urgency": "Green",
+      "reason": "Infeksi saluran napas atas ringan",
+      "action": "Istirahat, obat simptomatik"
+    },
+    {
+      "keywords": ["gatal", "ruam ringan"],
+      "urgency": "Green",
+      "reason": "Masalah kulit ringan",
+      "action": "Observasi, konsultasi jika tidak membaik"
+    },
+    {
+      "keywords": ["diare ringan", "mencret"],
+      "urgency": "Green",
+      "reason": "Gastroenteritis ringan",
+      "action": "Rehidrasi, diet BRAT"
+    },
+    {
+      "keywords": ["pusing ringan", "sakit kepala ringan"],
+      "urgency": "Green",
+      "reason": "Nyeri kepala ringan",
+      "action": "Istirahat, obat pereda nyeri"
+    }
+  ]
+}

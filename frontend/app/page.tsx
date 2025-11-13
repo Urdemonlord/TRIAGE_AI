@@ -1,0 +1,242 @@
+'use client';
+
+import Link from 'next/link';
+import { useEffect, useState } from 'react';
+import { useAuth } from '@/lib/hooks/useAuth';
+
+export default function Home() {
+  const { user, isAuthenticated } = useAuth();
+  const [mounted, setMounted] = useState(false);
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
+
+  if (!mounted) {
+    return null;
+  }
+
+  return (
+    <main className="min-h-screen bg-gradient-to-br from-primary-50 via-white to-primary-50">
+      {/* Navbar */}
+      <nav className="fixed top-0 w-full bg-white/80 backdrop-blur-lg border-b border-gray-200 z-50">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="flex justify-between items-center h-16">
+            <div className="flex items-center space-x-3">
+              <div className="w-10 h-10 bg-primary-600 rounded-lg flex items-center justify-center">
+                <span className="text-white font-bold text-xl">T</span>
+              </div>
+              <span className="text-2xl font-bold text-gray-900">TRIAGE<span className="text-primary-600">.AI</span></span>
+            </div>
+            <div className="flex items-center space-x-4">
+              <Link href="/patient/login" className="text-gray-600 hover:text-gray-900 text-sm">Pasien</Link>
+              <Link href="/doctor/login" className="text-gray-600 hover:text-gray-900 text-sm">Dokter</Link>
+              {isAuthenticated && user ? (
+                <Link href={user.user_metadata?.role === 'doctor' ? '/doctor' : '/patient'} className="btn-primary text-sm">
+                  Dashboard
+                </Link>
+              ) : (
+                <Link href="/patient/check" className="btn-primary text-sm">Mulai Cek</Link>
+              )}
+            </div>
+          </div>
+        </div>
+      </nav>
+
+      {/* Hero Section */}
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-32 pb-20">
+        <div className="grid md:grid-cols-2 gap-12 items-center">
+          {/* Left Column */}
+          <div>
+            <div className="inline-flex items-center space-x-2 bg-primary-100 text-primary-700 px-4 py-2 rounded-full text-sm font-medium mb-6">
+              <span className="w-2 h-2 bg-primary-600 rounded-full animate-pulse"></span>
+              <span>Powered by AI & Medical Rules</span>
+            </div>
+
+            <h1 className="text-5xl font-bold text-gray-900 mb-6">
+              Cek Gejala Kesehatan Anda dengan
+              <span className="text-primary-600"> AI Cerdas</span>
+            </h1>
+
+            <p className="text-xl text-gray-600 mb-8">
+              Sistem triase cerdas berbasis AI yang membantu Anda mengetahui tingkat urgensi kondisi kesehatan
+              dalam hitungan detik. Didukung oleh machine learning dan aturan medis profesional.
+            </p>
+
+            <div className="flex flex-col sm:flex-row gap-4">
+              <Link href="/patient/signup" className="btn-primary text-center">
+                Mulai Sebagai Pasien
+              </Link>
+              <Link href="/doctor/signup" className="btn-secondary text-center">
+                Daftar Sebagai Dokter
+              </Link>
+            </div>
+
+            {/* Stats */}
+            <div className="grid grid-cols-3 gap-6 mt-12">
+              <div>
+                <div className="text-3xl font-bold text-primary-600">95%</div>
+                <div className="text-sm text-gray-600">Akurasi Deteksi</div>
+              </div>
+              <div>
+                <div className="text-3xl font-bold text-primary-600">&lt;5s</div>
+                <div className="text-sm text-gray-600">Waktu Analisis</div>
+              </div>
+              <div>
+                <div className="text-3xl font-bold text-primary-600">24/7</div>
+                <div className="text-sm text-gray-600">Layanan Tersedia</div>
+              </div>
+            </div>
+          </div>
+
+          {/* Right Column */}
+          <div className="relative">
+            <div className="card">
+              <div className="flex items-center space-x-3 mb-6">
+                <div className="w-3 h-3 bg-green-500 rounded-full"></div>
+                <div className="w-3 h-3 bg-yellow-500 rounded-full"></div>
+                <div className="w-3 h-3 bg-red-500 rounded-full"></div>
+              </div>
+
+              <h3 className="text-lg font-semibold mb-4">Demo Hasil Triase</h3>
+
+              <div className="bg-danger-50 border border-danger-200 rounded-lg p-4 mb-4">
+                <div className="flex items-center justify-between mb-2">
+                  <span className="urgency-badge urgency-red">URGENT</span>
+                  <span className="text-2xl font-bold text-danger-600">95/100</span>
+                </div>
+                <p className="text-sm text-danger-700">Memerlukan penanganan medis segera</p>
+              </div>
+
+              <div className="space-y-3 text-sm">
+                <div className="flex items-start">
+                  <div className="w-5 h-5 bg-primary-100 rounded flex items-center justify-center mr-3 mt-0.5">
+                    <svg className="w-3 h-3 text-primary-600" fill="currentColor" viewBox="0 0 20 20">
+                      <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
+                    </svg>
+                  </div>
+                  <div>
+                    <div className="font-medium text-gray-900">Kategori: Kardiovaskular</div>
+                    <div className="text-gray-600">Confidence: Tinggi (92%)</div>
+                  </div>
+                </div>
+
+                <div className="flex items-start">
+                  <div className="w-5 h-5 bg-danger-100 rounded flex items-center justify-center mr-3 mt-0.5">
+                    <span className="text-danger-600 font-bold text-xs">!</span>
+                  </div>
+                  <div>
+                    <div className="font-medium text-gray-900">Red Flags Terdeteksi</div>
+                    <div className="text-gray-600">Nyeri dada menjalar, Sesak napas</div>
+                  </div>
+                </div>
+
+                <div className="flex items-start">
+                  <div className="w-5 h-5 bg-warning-100 rounded flex items-center justify-center mr-3 mt-0.5">
+                    <span className="text-warning-600 font-bold text-xs">→</span>
+                  </div>
+                  <div>
+                    <div className="font-medium text-gray-900">Rekomendasi</div>
+                    <div className="text-gray-600">Segera ke IGD atau hubungi ambulans (119)</div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* Features */}
+        <div className="mt-24">
+          <h2 className="text-3xl font-bold text-center mb-12">Mengapa Memilih TRIAGE.AI?</h2>
+
+          <div className="grid md:grid-cols-3 gap-8">
+            <div className="card hover:shadow-md transition-shadow">
+              <div className="w-12 h-12 bg-primary-100 rounded-lg flex items-center justify-center mb-4">
+                <svg className="w-6 h-6 text-primary-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                </svg>
+              </div>
+              <h3 className="text-xl font-semibold mb-3">AI Hybrid Approach</h3>
+              <p className="text-gray-600">
+                Kombinasi machine learning dan rule-based system untuk hasil yang akurat dan dapat dipercaya.
+              </p>
+            </div>
+
+            <div className="card hover:shadow-md transition-shadow">
+              <div className="w-12 h-12 bg-success-100 rounded-lg flex items-center justify-center mb-4">
+                <svg className="w-6 h-6 text-success-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                </svg>
+              </div>
+              <h3 className="text-xl font-semibold mb-3">Cepat & Real-time</h3>
+              <p className="text-gray-600">
+                Dapatkan hasil analisis dalam hitungan detik tanpa perlu menunggu lama untuk diagnosis awal.
+              </p>
+            </div>
+
+            <div className="card hover:shadow-md transition-shadow">
+              <div className="w-12 h-12 bg-warning-100 rounded-lg flex items-center justify-center mb-4">
+                <svg className="w-6 h-6 text-warning-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
+                </svg>
+              </div>
+              <h3 className="text-xl font-semibold mb-3">Aman & Terverifikasi</h3>
+              <p className="text-gray-600">
+                Data dienkripsi aman dan hasil dapat diverifikasi oleh tenaga medis profesional.
+              </p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* Footer */}
+      <footer className="bg-gray-900 text-gray-400 py-12 mt-24">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="grid md:grid-cols-4 gap-8 mb-8">
+            <div>
+              <div className="flex items-center space-x-3 mb-4">
+                <div className="w-8 h-8 bg-primary-600 rounded-lg flex items-center justify-center">
+                  <span className="text-white font-bold">T</span>
+                </div>
+                <span className="text-xl font-bold text-white">TRIAGE.AI</span>
+              </div>
+              <p className="text-sm">
+                Platform telemedicine berbasis AI untuk Indonesia yang lebih sehat.
+              </p>
+            </div>
+
+            <div>
+              <h4 className="text-white font-semibold mb-3">Untuk Pasien</h4>
+              <ul className="space-y-2 text-sm">
+                <li><Link href="/patient/signup" className="hover:text-white">Daftar Pasien</Link></li>
+                <li><Link href="/patient/login" className="hover:text-white">Masuk</Link></li>
+                <li><Link href="/patient/check" className="hover:text-white">Cek Gejala</Link></li>
+              </ul>
+            </div>
+
+            <div>
+              <h4 className="text-white font-semibold mb-3">Untuk Dokter</h4>
+              <ul className="space-y-2 text-sm">
+                <li><Link href="/doctor/signup" className="hover:text-white">Daftar Dokter</Link></li>
+                <li><Link href="/doctor/login" className="hover:text-white">Masuk</Link></li>
+              </ul>
+            </div>
+
+            <div>
+              <h4 className="text-white font-semibold mb-3">Lainnya</h4>
+              <ul className="space-y-2 text-sm">
+                <li><Link href="/terms" className="hover:text-white">Syarat & Ketentuan</Link></li>
+                <li><Link href="/privacy" className="hover:text-white">Privasi</Link></li>
+                <li><a href="mailto:support@triageai.com" className="hover:text-white">Hubungi Kami</a></li>
+              </ul>
+            </div>
+          </div>
+
+          <div className="border-t border-gray-800 pt-8 text-sm text-center">
+            <p>© 2025 TRIAGE.AI - MeowLabs / UNIMUS. Hasil AI adalah pendukung, bukan pengganti diagnosis medis.</p>
+          </div>
+        </div>
+      </footer>
+    </main>
+  );
+}

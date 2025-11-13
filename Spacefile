@@ -1,0 +1,14 @@
+v: 0
+micros:
+  - name: triage-ai-service
+    src: ai-service
+    engine: python3.12
+    run: uvicorn app.main:app --host 0.0.0.0 --port $PORT
+    dev: uvicorn app.main:app --host 0.0.0.0 --port 8000 --reload
+    build:
+      - pip install --no-cache-dir -r requirements.txt
+    env:
+      - LLM_API_KEY
+      - LLM_BASE_URL
+      - LLM_MODEL
+      - REDIS_URL
