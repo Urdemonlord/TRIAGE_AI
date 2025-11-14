@@ -4,7 +4,22 @@ Panduan singkat untuk deploy dalam 15 menit!
 
 ---
 
-## 🎯 TL;DR
+## 🎯 Pilih Deployment Strategy
+
+### Option A: Vercel + Railway (Recommended)
+- Frontend → Vercel
+- AI Service → Railway (no timeout, always-on)
+- **Best for**: Production apps dengan heavy ML processing
+
+### Option B: Vercel Only (Simpler) ⭐ NEW
+- Frontend → Vercel
+- AI Service → Vercel (serverless)
+- **Best for**: Simpler setup, development, light workload
+- ⚠️ Limitation: 10s timeout (free tier), 60s (pro tier)
+
+---
+
+## 🎯 TL;DR - Option A (Vercel + Railway)
 
 1. **Push ke GitHub** → ✅
 2. **Deploy frontend ke Vercel** → 5 menit
@@ -13,6 +28,8 @@ Panduan singkat untuk deploy dalam 15 menit!
 5. **Test & verify** → 3 menit
 
 **Total: ~15 menit**
+
+> **Want Vercel-only deployment?** See [Option B below](#option-b-vercel-only-deployment) or read `VERCEL_DEPLOYMENT.md`
 
 ---
 
@@ -170,9 +187,46 @@ Your app is now live at:
 
 ## 📚 Need More Help?
 
-- **Detailed Guide:** `DEPLOYMENT.md`
+- **Detailed Guide (Vercel + Railway):** `DEPLOYMENT.md`
+- **Vercel-only Guide:** `VERCEL_DEPLOYMENT.md` ⭐ NEW
+- **Environment Variables:** `ENV_VARIABLES.md`
 - **Vercel Docs:** https://vercel.com/docs
 - **Railway Docs:** https://docs.railway.app
+
+---
+
+## 🆕 Option B: Vercel-Only Deployment
+
+### Keuntungan:
+- ✅ Satu platform untuk semua
+- ✅ Lebih simple setup
+- ✅ Auto HTTPS & CDN
+- ✅ Free tier tersedia
+
+### Limitasi:
+- ⚠️ Timeout 10s (free) / 60s (pro)
+- ⚠️ Cold start bisa lambat
+- ⚠️ Perlu optimize ML model
+
+### Quick Steps:
+
+1. **Deploy Frontend:**
+   - https://vercel.com/new
+   - Import TRIAGE_AI
+   - Root: `frontend`
+   - Deploy
+
+2. **Deploy AI Service:**
+   - https://vercel.com/new (lagi, new project)
+   - Import TRIAGE_AI (lagi)
+   - Root: `ai-service`
+   - Deploy
+
+3. **Update Environment:**
+   - Update `NEXT_PUBLIC_API_URL` di frontend
+   - Point ke AI service URL
+
+**Detailed guide:** See `VERCEL_DEPLOYMENT.md`
 
 ---
 
