@@ -3,6 +3,8 @@ import "./globals.css";
 import { AuthProvider } from "@/contexts/AuthContext";
 import { ThemeProvider } from "@/contexts/ThemeContext";
 import { LanguageProvider } from "@/contexts/LanguageContext";
+import { NotificationProvider } from "@/contexts/NotificationContext";
+import { Toaster } from "react-hot-toast";
 
 export const metadata: Metadata = {
   title: "TRIAGE.AI - Smart TeleHealth Triage System",
@@ -20,7 +22,10 @@ export default function RootLayout({
         <ThemeProvider>
           <LanguageProvider>
             <AuthProvider>
-              {children}
+              <NotificationProvider>
+                <Toaster position="top-right" />
+                {children}
+              </NotificationProvider>
             </AuthProvider>
           </LanguageProvider>
         </ThemeProvider>

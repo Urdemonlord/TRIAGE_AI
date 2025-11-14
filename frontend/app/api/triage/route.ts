@@ -2,6 +2,8 @@ import { NextRequest, NextResponse } from 'next/server';
 import { supabase } from '@/lib/supabase';
 import { triageSessionService, auditLogService } from '@/lib/db';
 import { triageAPI } from '@/lib/api';
+import { cacheService, cacheKeys, cacheTTL } from '@/lib/redis';
+import { notifyRedUrgencyCase } from '@/lib/notifications';
 
 /**
  * POST /api/triage
@@ -70,6 +72,36 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'Failed to save session' }, { status: 500 });
     }
 
+    // Cache the triage result
+    if (session?.id) {
+      await cacheService.set(
+        cacheKeys.triageSession(session.id),
+        { ai_result: triageResult, db_session: session },
+        cacheTTL.LONG
+      );
+
+      // Invalidate patient history cache
+      await cacheService.delete(cacheKeys.triageHistory(patientProfile.id));
+    }
+
+    // Send notification for Red urgency cases
+    if (triageResult.urgency.urgency_level === 'Red' && session?.id) {
+      // Get patient name for notification
+      const { data: patient } = await supabase
+        .from('patients')
+        .select('name')
+        .eq('id', patientProfile.id)
+        .single();
+
+      if (patient) {
+        await notifyRedUrgencyCase(
+          session.id,
+          patient.name,
+          complaint
+        );
+      }
+    }
+
     // Log audit
     await auditLogService.log({
       actor_id: user.id,
@@ -92,6 +124,62 @@ export async function POST(request: NextRequest) {
     });
   } catch (error: any) {
     console.error('Triage API error:', error);
+    return NextResponse.json({ error: error.message }, { status: 500 });
+  }
+}
+
+/**
+ * GET /api/triage
+ * Get triage sessions for authenticated user with caching
+ */
+export async function GET(request: NextRequest) {
+  try {
+    // Get authenticated user
+    const {
+      data: { user },
+    } = await supabase.auth.getUser();
+
+    if (!user) {
+      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+    }
+
+    // Get patient profile
+    const { data: patientProfile, error: patientError } = await supabase
+      .from('patients')
+      .select('id')
+      .eq('user_id', user.id)
+      .single();
+
+    if (patientError || !patientProfile) {
+      return NextResponse.json({ error: 'Patient profile not found' }, { status: 404 });
+    }
+
+    // Try cache first
+    const cacheKey = cacheKeys.triageHistory(patientProfile.id);
+    const cached = await cacheService.get(cacheKey);
+    if (cached) {
+      return NextResponse.json({ success: true, sessions: cached, cached: true });
+    }
+
+    // Fetch from database
+    const { data: sessions, error: sessionsError } = await supabase
+      .from('triage_sessions')
+      .select('*')
+      .eq('patient_id', patientProfile.id)
+      .order('created_at', { ascending: false })
+      .limit(50);
+
+    if (sessionsError) {
+      console.error('Database error:', sessionsError);
+      return NextResponse.json({ error: 'Failed to fetch sessions' }, { status: 500 });
+    }
+
+    // Cache the result
+    await cacheService.set(cacheKey, sessions, cacheTTL.MEDIUM);
+
+    return NextResponse.json({ success: true, sessions, cached: false });
+  } catch (error: any) {
+    console.error('Triage GET error:', error);
     return NextResponse.json({ error: error.message }, { status: 500 });
   }
 }

@@ -85,7 +85,12 @@ export default function PatientProfilePage() {
     setLoading(true);
 
     try {
-      const { error } = await updateProfile(formData);
+      // Remove empty gender field
+      const dataToSubmit = {
+        ...formData,
+        gender: formData.gender || undefined
+      };
+      const { error } = await updateProfile(dataToSubmit);
 
       if (error) {
         setError(error.message || 'Gagal memperbarui profile');
