@@ -1,6 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { supabase } from '@/lib/supabase';
 import { triageNoteService, triageSessionService, auditLogService } from '@/lib/db';
+import { cacheService, cacheKeys } from '@/lib/redis';
+import { notifyDoctorNote, notifyStatusUpdate } from '@/lib/notifications';
 
 /**
  * POST /api/triage/[sessionId]/notes
@@ -78,6 +80,31 @@ export async function POST(
 
     if (updateError) {
       return NextResponse.json({ error: 'Failed to update session' }, { status: 500 });
+    }
+
+    // Invalidate caches
+    await cacheService.delete(cacheKeys.triageSession(sessionId));
+    await cacheService.delete(cacheKeys.triageHistory(session.patient_id));
+
+    // Send notifications to patient
+    const { data: doctor } = await supabase
+      .from('doctors')
+      .select('name')
+      .eq('id', doctorProfile.id)
+      .single();
+
+    if (doctor) {
+      await notifyDoctorNote(
+        session.patient_id,
+        doctor.name,
+        sessionId
+      );
+
+      await notifyStatusUpdate(
+        session.patient_id,
+        sessionId,
+        'completed'
+      );
     }
 
     // Log audit

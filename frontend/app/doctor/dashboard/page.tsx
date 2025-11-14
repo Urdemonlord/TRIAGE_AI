@@ -7,6 +7,7 @@ import { useAuth } from '@/contexts/AuthContext';
 import { dbService, type TriageRecord, type DoctorNote } from '@/lib/supabase';
 import { format } from 'date-fns';
 import { id as idLocale } from 'date-fns/locale';
+import NotificationBell from '@/components/NotificationBell';
 
 export default function DoctorDashboardPage() {
   const router = useRouter();
@@ -89,7 +90,7 @@ export default function DoctorDashboardPage() {
         notes: noteForm.notes,
         prescription: noteForm.prescription,
         follow_up_needed: noteForm.follow_up_needed,
-        follow_up_date: noteForm.follow_up_date || null,
+        follow_up_date: noteForm.follow_up_date || undefined,
         status: 'reviewed',
       });
 
@@ -176,6 +177,7 @@ export default function DoctorDashboardPage() {
               </span>
             </Link>
             <div className="flex items-center space-x-4">
+              <NotificationBell />
               <div className="flex items-center space-x-2">
                 <div className="w-8 h-8 bg-blue-100 rounded-full flex items-center justify-center">
                   <svg className="w-4 h-4 text-blue-600" fill="currentColor" viewBox="0 0 20 20">

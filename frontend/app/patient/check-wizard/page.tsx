@@ -207,7 +207,7 @@ export default function CheckWizardPage() {
         patient_id: patient.id,
         triage_id: result.triage_id,
         complaint: result.original_complaint,
-        urgency_level: result.urgency.urgency_level,
+        urgency_level: result.urgency.urgency_level as "Green" | "Yellow" | "Red",
         urgency_score: result.urgency.urgency_score,
         primary_category: result.primary_category,
         category_confidence: result.category_confidence,
