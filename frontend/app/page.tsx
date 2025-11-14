@@ -2,10 +2,14 @@
 
 import Link from 'next/link';
 import { useEffect, useState } from 'react';
-import { useAuth } from '@/lib/hooks/useAuth';
+import { useAuth } from '@/contexts/AuthContext';
+import { useLanguage } from '@/contexts/LanguageContext';
+import DarkModeToggle from '@/components/DarkModeToggle';
+import LanguageSwitcher from '@/components/LanguageSwitcher';
 
 export default function Home() {
-  const { user, isAuthenticated } = useAuth();
+  const { user } = useAuth();
+  const { t } = useLanguage();
   const [mounted, setMounted] = useState(false);
 
   useEffect(() => {
@@ -17,29 +21,30 @@ export default function Home() {
   }
 
   return (
-    <main className="min-h-screen bg-gradient-to-br from-primary-50 via-white to-primary-50">
+    <main className="min-h-screen bg-gradient-to-br from-primary-50 via-white to-primary-50 dark:from-gray-900 dark:via-gray-800 dark:to-gray-900 transition-colors duration-200">
       {/* Navbar */}
-      <nav className="fixed top-0 w-full bg-white/80 backdrop-blur-lg border-b border-gray-200 z-50">
+      <nav className="fixed top-0 w-full bg-white/80 dark:bg-gray-900/80 backdrop-blur-lg border-b border-gray-200 dark:border-gray-700 z-50 transition-colors duration-200">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between items-center h-16">
             <div className="flex items-center space-x-3">
               <div className="w-10 h-10 bg-primary-600 rounded-lg flex items-center justify-center">
                 <span className="text-white font-bold text-xl">T</span>
               </div>
-              <span className="text-2xl font-bold text-gray-900">TRIAGE<span className="text-primary-600">.AI</span></span>
+              <span className="text-2xl font-bold text-gray-900 dark:text-white">TRIAGE<span className="text-primary-600">.AI</span></span>
             </div>
             <div className="flex items-center space-x-4">
-              <Link href="/patient/login" className="text-gray-600 hover:text-gray-900 text-sm">Pasien</Link>
-              <Link href="/doctor/login" className="text-gray-600 hover:text-gray-900 text-sm">Dokter</Link>
-              {isAuthenticated && user ? (
-                <Link href={user.user_metadata?.role === 'doctor' ? '/doctor' : '/patient'} className="btn-primary text-sm">
+              <Link href="/auth/login" className="text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white text-sm">{t.login}</Link>
+              <Link href="/auth/register" className="text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white text-sm">{t.register}</Link>
+              <LanguageSwitcher />
+              <DarkModeToggle />
+              {user ? (
+                <Link href={user.user_metadata?.role === 'doctor' ? '/doctor/dashboard' : '/patient/check'} className="btn-primary text-sm">
                   Dashboard
                 </Link>
               ) : (
-                <Link href="/patient/check" className="btn-primary text-sm">Mulai Cek</Link>
+                <Link href="/patient/check-wizard" className="btn-primary text-sm">{t.startCheck}</Link>
               )}
-            </div>
-          </div>
+            </div>          </div>
         </div>
       </nav>
 
@@ -53,22 +58,20 @@ export default function Home() {
               <span>Powered by AI & Medical Rules</span>
             </div>
 
-            <h1 className="text-5xl font-bold text-gray-900 mb-6">
-              Cek Gejala Kesehatan Anda dengan
-              <span className="text-primary-600"> AI Cerdas</span>
+            <h1 className="text-5xl font-bold text-gray-900 dark:text-white mb-6">
+              {t.heroTitle}
             </h1>
 
-            <p className="text-xl text-gray-600 mb-8">
-              Sistem triase cerdas berbasis AI yang membantu Anda mengetahui tingkat urgensi kondisi kesehatan
-              dalam hitungan detik. Didukung oleh machine learning dan aturan medis profesional.
+            <p className="text-xl text-gray-600 dark:text-gray-300 mb-8">
+              {t.heroSubtitle}
             </p>
 
             <div className="flex flex-col sm:flex-row gap-4">
               <Link href="/patient/signup" className="btn-primary text-center">
-                Mulai Sebagai Pasien
+                {t.startAsPatient}
               </Link>
               <Link href="/doctor/signup" className="btn-secondary text-center">
-                Daftar Sebagai Dokter
+                {t.startAsDoctor}
               </Link>
             </div>
 
@@ -156,9 +159,9 @@ export default function Home() {
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
                 </svg>
               </div>
-              <h3 className="text-xl font-semibold mb-3">AI Hybrid Approach</h3>
-              <p className="text-gray-600">
-                Kombinasi machine learning dan rule-based system untuk hasil yang akurat dan dapat dipercaya.
+              <h3 className="text-xl font-semibold mb-3 dark:text-white">{t.features.aiTitle}</h3>
+              <p className="text-gray-600 dark:text-gray-300">
+                {t.features.aiDesc}
               </p>
             </div>
 
@@ -168,9 +171,9 @@ export default function Home() {
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
                 </svg>
               </div>
-              <h3 className="text-xl font-semibold mb-3">Cepat & Real-time</h3>
-              <p className="text-gray-600">
-                Dapatkan hasil analisis dalam hitungan detik tanpa perlu menunggu lama untuk diagnosis awal.
+              <h3 className="text-xl font-semibold mb-3 dark:text-white">{t.features.fastTitle}</h3>
+              <p className="text-gray-600 dark:text-gray-300">
+                {t.features.fastDesc}
               </p>
             </div>
 
@@ -180,9 +183,9 @@ export default function Home() {
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
                 </svg>
               </div>
-              <h3 className="text-xl font-semibold mb-3">Aman & Terverifikasi</h3>
-              <p className="text-gray-600">
-                Data dienkripsi aman dan hasil dapat diverifikasi oleh tenaga medis profesional.
+              <h3 className="text-xl font-semibold mb-3 dark:text-white">{t.features.secureTitle}</h3>
+              <p className="text-gray-600 dark:text-gray-300">
+                {t.features.secureDesc}
               </p>
             </div>
           </div>

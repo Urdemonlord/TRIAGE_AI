@@ -15,7 +15,7 @@ from datetime import datetime
 from app.utils.preprocessor import preprocess_text, extract_symptoms, extract_numeric_data
 from app.models.urgency_engine import analyze_urgency
 from app.models.classifier import SymptomClassifier
-from app.utils.llm_service import generate_medical_summary, generate_category_explanation, generate_first_aid_advice
+from app.utils.llm_service import generate_medical_summary, generate_category_explanation, generate_first_aid_advice, analyze_skin_image
 
 # Initialize FastAPI app
 app = FastAPI(
@@ -113,6 +113,23 @@ class HealthCheckResponse(BaseModel):
     status: str
     model_loaded: bool
     timestamp: str
+
+
+class ImageAnalysisRequest(BaseModel):
+    image_base64: str = Field(..., description="Base64 encoded image with data:image/... prefix")
+    complaint: Optional[str] = Field(default="", description="Optional text complaint for context")
+
+
+class ImageAnalysisResponse(BaseModel):
+    success: bool
+    timestamp: str
+    description: str
+    possible_conditions: List[str]
+    severity: str
+    recommendations: str
+    urgency_flag: bool
+    warning: Optional[str] = None
+    error: Optional[str] = None
 
 
 # API Endpoints
@@ -273,6 +290,48 @@ async def check_urgency(request: TriageRequest):
         }
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
+
+
+@app.post("/api/v1/analyze-image", response_model=ImageAnalysisResponse)
+async def analyze_image(request: ImageAnalysisRequest):
+    """
+    Analyze skin condition image using Vision API
+
+    Accepts a base64 encoded image and returns:
+    - Visual description of the skin condition
+    - Possible diagnoses
+    - Severity assessment
+    - Medical recommendations
+    - Urgency flag
+    """
+    try:
+        # Call vision analysis (runs in thread pool to avoid blocking)
+        analysis_result = await asyncio.to_thread(
+            analyze_skin_image,
+            image_base64=request.image_base64,
+            complaint=request.complaint or ""
+        )
+
+        # Build response
+        response = {
+            "success": True if "error" not in analysis_result else False,
+            "timestamp": datetime.utcnow().isoformat(),
+            "description": analysis_result.get("description", ""),
+            "possible_conditions": analysis_result.get("possible_conditions", []),
+            "severity": analysis_result.get("severity", "unknown"),
+            "recommendations": analysis_result.get("recommendations", ""),
+            "urgency_flag": analysis_result.get("urgency_flag", False),
+            "warning": analysis_result.get("warning"),
+            "error": analysis_result.get("error")
+        }
+
+        return response
+
+    except Exception as e:
+        raise HTTPException(
+            status_code=500,
+            detail=f"Image analysis error: {str(e)}"
+        )
 
 
 @app.get("/api/v1/categories")

@@ -1,15 +1,26 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { triageAPI, type TriageResponse } from '@/lib/api';
+import { useAuth } from '@/contexts/AuthContext';
+import { dbService } from '@/lib/supabase';
 
 export default function PatientCheckPage() {
   const router = useRouter();
+  const { user, patient, loading: authLoading } = useAuth();
   const [complaint, setComplaint] = useState('');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
+  const [showLoginPrompt, setShowLoginPrompt] = useState(false);
+
+  // Check if user is authenticated
+  useEffect(() => {
+    if (!authLoading && !user) {
+      setShowLoginPrompt(true);
+    }
+  }, [user, authLoading]);
 
   // Common symptoms checklist
   const commonSymptoms = [
@@ -51,17 +62,50 @@ export default function PatientCheckPage() {
       return;
     }
 
+    // Prompt login if not authenticated
+    if (!user || !patient) {
+      setShowLoginPrompt(true);
+      setError('Silakan login terlebih dahulu untuk menyimpan riwayat triase Anda');
+      return;
+    }
+
     setLoading(true);
 
     try {
+      // 1. Call AI triage API
       const result = await triageAPI.performTriage({
         complaint: complaint.trim(),
       });
 
-      // Store result in sessionStorage for display on result page
+      // 2. Save to database
+      const { data: savedRecord, error: dbError } = await dbService.createTriageRecord({
+        patient_id: patient.id,
+        triage_id: result.triage_id,
+        complaint: result.original_complaint,
+        urgency_level: result.urgency.urgency_level,
+        urgency_score: result.urgency.urgency_score,
+        primary_category: result.primary_category,
+        category_confidence: result.category_confidence,
+        extracted_symptoms: result.extracted_symptoms,
+        detected_flags: result.urgency.detected_flags,
+        numeric_data: result.numeric_data,
+        summary: result.summary,
+        category_explanation: result.category_explanation,
+        first_aid_advice: result.first_aid_advice,
+        result_json: result,
+        requires_doctor_review: result.requires_doctor_review,
+        doctor_reviewed: false,
+      });
+
+      if (dbError) {
+        console.error('Database save error:', dbError);
+        // Continue anyway - still show results even if DB save fails
+      }
+
+      // 3. Store result in sessionStorage for immediate display
       sessionStorage.setItem('triageResult', JSON.stringify(result));
 
-      // Navigate to result page
+      // 4. Navigate to result page
       router.push(`/patient/result?id=${result.triage_id}`);
     } catch (err: any) {
       console.error('Triage error:', err);
@@ -102,6 +146,51 @@ export default function PatientCheckPage() {
             Ceritakan keluhan Anda dengan detail. AI kami akan menganalisis dan memberikan rekomendasi.
           </p>
         </div>
+
+        {/* Login Prompt */}
+        {showLoginPrompt && !user && (
+          <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 mb-6">
+            <div className="flex items-start">
+              <div className="flex-shrink-0">
+                <svg className="h-5 w-5 text-blue-600" fill="currentColor" viewBox="0 0 20 20">
+                  <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clipRule="evenodd" />
+                </svg>
+              </div>
+              <div className="ml-3 flex-1">
+                <h3 className="text-sm font-medium text-blue-900">Login untuk Menyimpan Riwayat</h3>
+                <p className="mt-1 text-sm text-blue-700">
+                  Silakan login atau daftar untuk menyimpan hasil triase dan melihat riwayat kesehatan Anda.
+                </p>
+                <div className="mt-3 flex space-x-3">
+                  <Link href="/auth/login" className="text-sm font-medium text-blue-600 hover:text-blue-800">
+                    Login →
+                  </Link>
+                  <Link href="/auth/register" className="text-sm font-medium text-blue-600 hover:text-blue-800">
+                    Daftar →
+                  </Link>
+                </div>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* User Welcome */}
+        {user && patient && (
+          <div className="bg-success-50 border border-success-200 rounded-lg p-4 mb-6">
+            <div className="flex items-center">
+              <div className="flex-shrink-0">
+                <svg className="h-5 w-5 text-success-600" fill="currentColor" viewBox="0 0 20 20">
+                  <path fillRule="evenodd" d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z" clipRule="evenodd" />
+                </svg>
+              </div>
+              <div className="ml-3">
+                <p className="text-sm text-success-800">
+                  <strong>Halo, {patient.full_name}!</strong> Hasil triase Anda akan tersimpan di riwayat.
+                </p>
+              </div>
+            </div>
+          </div>
+        )}
 
         {/* Important Notice */}
         <div className="bg-warning-50 border border-warning-200 rounded-lg p-4 mb-8">

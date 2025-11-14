@@ -374,6 +374,128 @@ Berikan saran praktis yang AMAN untuk dilakukan di rumah sebelum konsultasi dokt
             print(f"[FALLBACK] First aid advice unavailable due to LLM error: {e}")
             return None
 
+    def analyze_skin_image(self, image_base64: str, complaint: str = "") -> Dict:
+        """
+        Analyze skin condition image using Vision API
+
+        Args:
+            image_base64: Base64 encoded image string (with data:image/... prefix)
+            complaint: Optional text complaint to provide context
+
+        Returns:
+            Dictionary with analysis results:
+            {
+                "description": "Description of what's visible",
+                "possible_conditions": ["condition1", "condition2"],
+                "severity": "mild/moderate/severe",
+                "recommendations": "What to do next",
+                "urgency_flag": true/false
+            }
+        """
+        if not self.is_available:
+            return {
+                "error": "Vision analysis unavailable",
+                "description": "Layanan analisis gambar tidak tersedia saat ini",
+                "recommendations": "Mohon konsultasi langsung dengan dokter untuk evaluasi visual kondisi kulit Anda."
+            }
+
+        try:
+            # Build prompt
+            context_text = f"\n\nKELUHAN PASIEN: {complaint}" if complaint else ""
+
+            prompt = f"""Analisis gambar kondisi kulit ini secara medis.{context_text}
+
+TUGAS:
+1. Jelaskan apa yang terlihat pada gambar (warna, tekstur, area terdampak)
+2. Identifikasi kemungkinan kondisi kulit (3-5 kemungkinan diagnosis)
+3. Tentukan tingkat keparahan: ringan/sedang/berat
+4. Berikan rekomendasi tindakan yang jelas
+5. Tentukan apakah ini memerlukan penanganan segera (urgent flag)
+
+Format jawaban dalam JSON:
+{{
+  "description": "deskripsi visual apa yang terlihat",
+  "possible_conditions": ["kondisi 1", "kondisi 2", "kondisi 3"],
+  "severity": "mild/moderate/severe",
+  "recommendations": "rekomendasi tindakan",
+  "urgency_flag": true/false,
+  "warning": "peringatan jika ada"
+}}
+
+PENTING: Gunakan Bahasa Indonesia. Tekankan bahwa ini adalah analisis AI dan perlu konfirmasi dokter."""
+
+            # Define LLM call function with vision
+            def make_llm_call():
+                return self.client.chat.completions.create(
+                    model=self.model,  # gpt-4o-mini supports vision
+                    messages=[
+                        {
+                            "role": "system",
+                            "content": "Anda adalah asisten medis AI yang menganalisis gambar kondisi kulit. Berikan analisis yang akurat, jelas, dan dalam Bahasa Indonesia. Selalu tekankan bahwa ini adalah analisis pendukung yang perlu dikonfirmasi oleh dokter."
+                        },
+                        {
+                            "role": "user",
+                            "content": [
+                                {
+                                    "type": "text",
+                                    "text": prompt
+                                },
+                                {
+                                    "type": "image_url",
+                                    "image_url": {
+                                        "url": image_base64
+                                    }
+                                }
+                            ]
+                        }
+                    ],
+                    max_tokens=500,
+                    temperature=0.7
+                )
+
+            # Call LLM with retry logic
+            response = self._retry_with_backoff(make_llm_call)
+            result_text = response.choices[0].message.content.strip()
+
+            # Try to parse JSON response
+            import json
+            try:
+                # Extract JSON from response (in case there's extra text)
+                json_start = result_text.find('{')
+                json_end = result_text.rfind('}') + 1
+                if json_start >= 0 and json_end > json_start:
+                    json_str = result_text[json_start:json_end]
+                    result_dict = json.loads(json_str)
+                else:
+                    # Fallback if no JSON found
+                    result_dict = {
+                        "description": result_text,
+                        "possible_conditions": ["Memerlukan evaluasi dokter"],
+                        "severity": "unknown",
+                        "recommendations": "Konsultasi dengan dokter untuk diagnosis yang akurat",
+                        "urgency_flag": False
+                    }
+            except json.JSONDecodeError:
+                # If JSON parsing fails, return text as description
+                result_dict = {
+                    "description": result_text,
+                    "possible_conditions": ["Memerlukan evaluasi dokter"],
+                    "severity": "unknown",
+                    "recommendations": "Konsultasi dengan dokter untuk diagnosis yang akurat",
+                    "urgency_flag": False
+                }
+
+            return result_dict
+
+        except Exception as e:
+            print(f"[ERROR] Vision API error: {e}")
+            return {
+                "error": str(e),
+                "description": "Terjadi kesalahan saat menganalisis gambar",
+                "recommendations": "Mohon coba lagi atau konsultasi langsung dengan dokter.",
+                "urgency_flag": False
+            }
+
 
 # Singleton instance
 llm_service = LLMService()
@@ -401,3 +523,8 @@ def generate_category_explanation(category: str, confidence: float) -> Optional[
 def generate_first_aid_advice(category: str, urgency: str) -> Optional[str]:
     """Generate first aid advice"""
     return llm_service.generate_first_aid_advice(category, urgency)
+
+
+def analyze_skin_image(image_base64: str, complaint: str = "") -> Dict:
+    """Analyze skin condition image using Vision API"""
+    return llm_service.analyze_skin_image(image_base64, complaint)
