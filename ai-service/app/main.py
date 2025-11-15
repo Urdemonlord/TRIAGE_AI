@@ -12,10 +12,10 @@ import asyncio
 from datetime import datetime
 
 # Import our custom modules
-from app.utils.preprocessor import preprocess_text, extract_symptoms, extract_numeric_data
-from app.models.urgency_engine import analyze_urgency
-from app.models.classifier import SymptomClassifier
-from app.utils.llm_service import generate_medical_summary, generate_category_explanation, generate_first_aid_advice, analyze_skin_image
+from utils.preprocessor import preprocess_text, extract_symptoms, extract_numeric_data
+from models.urgency_engine import analyze_urgency
+from models.classifier import SymptomClassifier
+from utils.llm_service import generate_medical_summary, generate_category_explanation, generate_first_aid_advice, analyze_skin_image
 
 # Initialize FastAPI app
 app = FastAPI(
