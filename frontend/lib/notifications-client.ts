@@ -43,6 +43,11 @@ export const notificationService = {
         .limit(limit);
 
       if (error) {
+        // If table doesn't exist (404), return empty array silently
+        if (error.code === 'PGRST116' || error.message?.includes('does not exist')) {
+          console.warn('Notifications table not found. Please run database migrations.');
+          return [];
+        }
         console.error('Error fetching notifications:', error);
         return [];
       }
@@ -67,6 +72,10 @@ export const notificationService = {
         .eq('read', false);
 
       if (error) {
+        // If table doesn't exist, return 0 silently
+        if (error.code === 'PGRST116' || error.message?.includes('does not exist')) {
+          return 0;
+        }
         console.error('Error fetching unread count:', error);
         return 0;
       }
@@ -154,32 +163,52 @@ export const notificationService = {
     userType: 'patient' | 'doctor',
     callback: (notification: Notification) => void
   ) {
-    const column = userType === 'patient' ? 'patient_id' : 'doctor_id';
+    try {
+      const column = userType === 'patient' ? 'patient_id' : 'doctor_id';
 
-    const channel = supabase
-      .channel(`notifications:${userId}`)
-      .on(
-        'postgres_changes',
-        {
-          event: 'INSERT',
-          schema: 'public',
-          table: 'notifications',
-          filter: `${column}=eq.${userId}`,
-        },
-        (payload: any) => {
-          const notification = payload.new as Notification;
-          callback(notification);
-        }
-      )
-      .subscribe();
+      const channel = supabase
+        .channel(`notifications:${userId}`)
+        .on(
+          'postgres_changes',
+          {
+            event: 'INSERT',
+            schema: 'public',
+            table: 'notifications',
+            filter: `${column}=eq.${userId}`,
+          },
+          (payload: any) => {
+            try {
+              const notification = payload.new as Notification;
+              callback(notification);
+            } catch (error) {
+              console.error('Error processing notification:', error);
+            }
+          }
+        )
+        .subscribe((status: string) => {
+          if (status === 'SUBSCRIPTION_ERROR') {
+            console.warn('Failed to subscribe to notifications. Table may not exist.');
+          }
+        });
 
-    return channel;
+      return channel;
+    } catch (error) {
+      console.error('Error setting up notification subscription:', error);
+      // Return a dummy channel that won't crash the app
+      return null;
+    }
   },
 
   /**
    * Unsubscribe from notifications
    */
   async unsubscribe(channel: any) {
-    await supabase.removeChannel(channel);
+    try {
+      if (channel) {
+        await supabase.removeChannel(channel);
+      }
+    } catch (error) {
+      console.error('Error unsubscribing from notifications:', error);
+    }
   },
 };
