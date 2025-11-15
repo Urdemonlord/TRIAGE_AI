@@ -195,12 +195,6 @@ export default function CheckWizardPage() {
   };
 
   const handleSubmit = async () => {
-    if (!user || !patient) {
-      setShowLoginPrompt(true);
-      setError('Silakan login terlebih dahulu untuk menyimpan hasil triase Anda');
-      return;
-    }
-
     setLoading(true);
     setError('');
 
@@ -212,31 +206,70 @@ export default function CheckWizardPage() {
         complaint: complaintText,
       });
 
-      // Save to database
-      const { error: dbError } = await dbService.createTriageRecord({
-        patient_id: patient.id,
-        triage_id: result.triage_id,
-        complaint: result.original_complaint,
-        urgency_level: result.urgency.urgency_level as "Green" | "Yellow" | "Red",
-        urgency_score: result.urgency.urgency_score,
-        primary_category: result.primary_category,
-        category_confidence: result.category_confidence,
-        extracted_symptoms: result.extracted_symptoms,
-        detected_flags: result.urgency.detected_flags,
-        numeric_data: result.numeric_data,
-        summary: result.summary,
-        category_explanation: result.category_explanation,
-        first_aid_advice: result.first_aid_advice,
-        result_json: result,
-        requires_doctor_review: result.requires_doctor_review,
-        doctor_reviewed: false,
-      });
+      // Save to database only if user is logged in
+      if (user && patient) {
+        const { error: dbError } = await dbService.createTriageRecord({
+          patient_id: patient.id,
+          triage_id: result.triage_id,
+          complaint: result.original_complaint,
+          urgency_level: result.urgency.urgency_level as "Green" | "Yellow" | "Red",
+          urgency_score: result.urgency.urgency_score,
+          primary_category: result.primary_category,
+          category_confidence: result.category_confidence,
+          extracted_symptoms: result.extracted_symptoms,
+          detected_flags: result.urgency.detected_flags,
+          numeric_data: result.numeric_data,
+          summary: result.summary,
+          category_explanation: result.category_explanation,
+          first_aid_advice: result.first_aid_advice,
+          result_json: result,
+          requires_doctor_review: result.requires_doctor_review,
+          doctor_reviewed: false,
+        });
 
-      if (dbError) {
-        console.error('Database save error:', dbError);
+        if (dbError) {
+          console.error('Database save error:', dbError);
+        }
+      } else if (user && !patient) {
+        // User is logged in but no patient record - try to create one
+        try {
+          const { data: newPatient, error: createError } = await dbService.createPatient({
+            user_id: user.id,
+            email: user.email || '',
+            full_name: user.user_metadata?.full_name || 'Patient',
+            created_at: new Date().toISOString(),
+            updated_at: new Date().toISOString(),
+          });
+
+          if (!createError && newPatient) {
+            // Now save the triage record
+            await dbService.createTriageRecord({
+              patient_id: newPatient.id,
+              triage_id: result.triage_id,
+              complaint: result.original_complaint,
+              urgency_level: result.urgency.urgency_level as "Green" | "Yellow" | "Red",
+              urgency_score: result.urgency.urgency_score,
+              primary_category: result.primary_category,
+              category_confidence: result.category_confidence,
+              extracted_symptoms: result.extracted_symptoms,
+              detected_flags: result.urgency.detected_flags,
+              numeric_data: result.numeric_data,
+              summary: result.summary,
+              category_explanation: result.category_explanation,
+              first_aid_advice: result.first_aid_advice,
+              result_json: result,
+              requires_doctor_review: result.requires_doctor_review,
+              doctor_reviewed: false,
+            });
+          }
+        } catch (createErr) {
+          console.error('Failed to create patient record:', createErr);
+          // Continue anyway - guest mode
+        }
       }
+      // If not logged in, just show results without saving (guest mode)
 
-      // Store result
+      // Store result in sessionStorage for display
       sessionStorage.setItem('triageResult', JSON.stringify(result));
 
       // Navigate to result
@@ -309,9 +342,9 @@ export default function CheckWizardPage() {
                 </svg>
               </div>
               <div className="ml-3 flex-1">
-                <h3 className="text-sm font-medium text-blue-900">Login untuk Menyimpan Riwayat</h3>
+                <h3 className="text-sm font-medium text-blue-900">Login untuk Menyimpan Riwayat (Opsional)</h3>
                 <p className="mt-1 text-sm text-blue-700">
-                  Silakan login atau daftar untuk menyimpan hasil triase dan melihat riwayat kesehatan Anda.
+                  Anda dapat melanjutkan tanpa login. Namun, jika Anda login atau daftar, hasil triase akan tersimpan dan dapat dilihat di riwayat kesehatan Anda.
                 </p>
                 <div className="mt-3 flex space-x-3">
                   <Link href="/auth/login" className="text-sm font-medium text-blue-600 hover:text-blue-800">
