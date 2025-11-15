@@ -65,7 +65,10 @@ __pycache__/
 *.pt
 *.pth
 *.onnx
-trained_model/
+# Allow trained_model folder with its pkl files
+!app/data/trained_model/
+!app/data/trained_model/*.pkl
+!app/data/trained_model/*.json
 models/trained/
 data/raw/
 data/processed/
