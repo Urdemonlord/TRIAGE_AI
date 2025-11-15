@@ -145,6 +145,14 @@ export default function PatientCheckPage() {
           <p className="text-lg text-gray-600">
             Ceritakan keluhan Anda dengan detail. AI kami akan menganalisis dan memberikan rekomendasi.
           </p>
+          <div className="mt-4">
+            <Link href="/patient/check-wizard" className="inline-flex items-center text-sm text-primary-600 hover:text-primary-700 font-medium">
+              <svg className="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 7l5 5m0 0l-5 5m5-5H6" />
+              </svg>
+              Lebih suka mode wizard lengkap dengan body map & image upload? Klik di sini
+            </Link>
+          </div>
         </div>
 
         {/* Login Prompt */}

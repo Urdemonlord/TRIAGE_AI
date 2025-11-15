@@ -28,7 +28,7 @@ export default function Home() {
               <LanguageSwitcher />
               <DarkModeToggle />
               {user ? (
-                <Link href={user.user_metadata?.role === 'doctor' ? '/doctor/dashboard' : '/patient/check'} className="btn-primary text-sm">
+                <Link href={user.user_metadata?.role === 'doctor' ? '/doctor/dashboard' : '/patient/check-wizard'} className="btn-primary text-sm">
                   Dashboard
                 </Link>
               ) : (
@@ -203,7 +203,7 @@ export default function Home() {
               <ul className="space-y-2 text-sm">
                 <li><Link href="/patient/signup" className="hover:text-white">Daftar Pasien</Link></li>
                 <li><Link href="/patient/login" className="hover:text-white">Masuk</Link></li>
-                <li><Link href="/patient/check" className="hover:text-white">Cek Gejala</Link></li>
+                <li><Link href="/patient/check-wizard" className="hover:text-white">Cek Gejala</Link></li>
               </ul>
             </div>
 

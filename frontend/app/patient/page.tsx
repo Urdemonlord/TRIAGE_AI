@@ -15,7 +15,7 @@ export default function PatientPage() {
                 TRIAGE<span className="text-primary-600">.AI</span>
               </span>
             </Link>
-            <Link href="/patient/check" className="btn-primary">
+            <Link href="/patient/check-wizard" className="btn-primary">
               Mulai Cek Gejala
             </Link>
           </div>
@@ -42,7 +42,7 @@ export default function PatientPage() {
             <p className="text-primary-100 mb-8">
               AI kami siap menganalisis keluhan Anda dan memberikan rekomendasi tindakan yang tepat
             </p>
-            <Link href="/patient/check" className="inline-block px-8 py-4 bg-white text-primary-600 rounded-lg font-semibold text-lg hover:bg-gray-100 transition-colors">
+            <Link href="/patient/check-wizard" className="inline-block px-8 py-4 bg-white text-primary-600 rounded-lg font-semibold text-lg hover:bg-gray-100 transition-colors">
               Cek Gejala Sekarang →
             </Link>
           </div>
@@ -188,7 +188,7 @@ export default function PatientPage() {
 
         {/* CTA Bottom */}
         <div className="text-center mt-16">
-          <Link href="/patient/check" className="btn-primary text-lg px-10 py-4">
+          <Link href="/patient/check-wizard" className="btn-primary text-lg px-10 py-4">
             Mulai Pemeriksaan Sekarang
           </Link>
           <p className="text-sm text-gray-500 mt-4">
