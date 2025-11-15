@@ -28,10 +28,11 @@ interface FormData {
 
 export default function CheckWizardPage() {
   const router = useRouter();
-  const { user, patient } = useAuth();
+  const { user, patient, loading: authLoading } = useAuth();
   const [currentStep, setCurrentStep] = useState<Step>(1);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
+  const [showLoginPrompt, setShowLoginPrompt] = useState(false);
 
   const [formData, setFormData] = useState<FormData>({
     mainComplaint: '',
@@ -51,6 +52,15 @@ export default function CheckWizardPage() {
   const [imageLoading, setImageLoading] = useState(false);
   const [imageError, setImageError] = useState('');
   const [symptomInputMode, setSymptomInputMode] = useState<'list' | 'bodymap'>('list');
+
+  // Check authentication status
+  useEffect(() => {
+    if (!authLoading && !user) {
+      setShowLoginPrompt(true);
+    } else if (!authLoading && user) {
+      setShowLoginPrompt(false);
+    }
+  }, [user, authLoading]);
 
   // Common symptoms with categories
   const symptomCategories = {
@@ -186,8 +196,8 @@ export default function CheckWizardPage() {
 
   const handleSubmit = async () => {
     if (!user || !patient) {
-      setError('Silakan login terlebih dahulu');
-      router.push('/auth/login');
+      setShowLoginPrompt(true);
+      setError('Silakan login terlebih dahulu untuk menyimpan hasil triase Anda');
       return;
     }
 
@@ -289,6 +299,51 @@ export default function CheckWizardPage() {
 
       {/* Main Content */}
       <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+        {/* Login Prompt */}
+        {showLoginPrompt && !user && (
+          <div className="mb-6 bg-blue-50 border border-blue-200 rounded-lg p-4">
+            <div className="flex items-start">
+              <div className="flex-shrink-0">
+                <svg className="h-5 w-5 text-blue-600" fill="currentColor" viewBox="0 0 20 20">
+                  <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clipRule="evenodd" />
+                </svg>
+              </div>
+              <div className="ml-3 flex-1">
+                <h3 className="text-sm font-medium text-blue-900">Login untuk Menyimpan Riwayat</h3>
+                <p className="mt-1 text-sm text-blue-700">
+                  Silakan login atau daftar untuk menyimpan hasil triase dan melihat riwayat kesehatan Anda.
+                </p>
+                <div className="mt-3 flex space-x-3">
+                  <Link href="/auth/login" className="text-sm font-medium text-blue-600 hover:text-blue-800">
+                    Login →
+                  </Link>
+                  <Link href="/auth/register" className="text-sm font-medium text-blue-600 hover:text-blue-800">
+                    Daftar →
+                  </Link>
+                </div>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* User Welcome */}
+        {user && patient && (
+          <div className="mb-6 bg-success-50 border border-success-200 rounded-lg p-4">
+            <div className="flex items-center">
+              <div className="flex-shrink-0">
+                <svg className="h-5 w-5 text-success-600" fill="currentColor" viewBox="0 0 20 20">
+                  <path fillRule="evenodd" d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z" clipRule="evenodd" />
+                </svg>
+              </div>
+              <div className="ml-3">
+                <p className="text-sm text-success-800">
+                  <strong>Halo, {patient.full_name}!</strong> Hasil triase Anda akan tersimpan di riwayat.
+                </p>
+              </div>
+            </div>
+          </div>
+        )}
+
         {/* Error Message */}
         {error && (
           <div className="mb-6 p-4 bg-danger-50 border border-danger-200 rounded-lg">
