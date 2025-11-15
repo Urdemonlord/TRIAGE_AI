@@ -92,8 +92,8 @@ export default function PatientSignupPage() {
         throw new Error('Gagal membuat profil pasien');
       }
 
-      // Redirect to patient check page
-      router.push('/patient/check');
+      // Redirect to symptom checker wizard
+      router.push('/patient/check-wizard');
     } catch (err: any) {
       console.error('Signup error:', err);
       setError(err.message || 'Terjadi kesalahan saat pendaftaran');

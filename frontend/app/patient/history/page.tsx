@@ -204,7 +204,7 @@ export default function PatientHistoryPage() {
           </div>
 
           {/* New Check Button */}
-          <Link href="/patient/check" className="btn-primary">
+          <Link href="/patient/check-wizard" className="btn-primary">
             + Cek Gejala Baru
           </Link>
         </div>
@@ -217,7 +217,7 @@ export default function PatientHistoryPage() {
             </svg>
             <h3 className="text-lg font-medium text-gray-900 mb-2">Belum Ada Riwayat</h3>
             <p className="text-gray-600 mb-4">Mulai pemeriksaan kesehatan pertama Anda</p>
-            <Link href="/patient/check" className="btn-primary inline-block">
+            <Link href="/patient/check-wizard" className="btn-primary inline-block">
               Cek Gejala Sekarang
             </Link>
           </div>

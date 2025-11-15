@@ -27,8 +27,8 @@ export default function LoginPage() {
         return;
       }
 
-      // Redirect based on role (check from user metadata)
-      router.push('/patient/check');
+      // Redirect to symptom checker wizard
+      router.push('/patient/check-wizard');
     } catch (err: any) {
       setError(err.message || 'Terjadi kesalahan. Silakan coba lagi.');
       setLoading(false);

@@ -67,7 +67,7 @@ export default function RegisterPage() {
 
       setSuccess(true);
       setTimeout(() => {
-        router.push('/patient/check');
+        router.push('/patient/check-wizard');
       }, 2000);
     } catch (err: any) {
       setError(err.message || 'Terjadi kesalahan. Silakan coba lagi.');

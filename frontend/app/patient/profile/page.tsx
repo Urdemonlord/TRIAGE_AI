@@ -526,7 +526,7 @@ export default function PatientProfilePage() {
         {/* Quick Actions */}
         {!editing && (
           <div className="mt-8 flex flex-col sm:flex-row gap-4">
-            <Link href="/patient/check" className="btn-primary flex-1 text-center">
+            <Link href="/patient/check-wizard" className="btn-primary flex-1 text-center">
               Cek Gejala Baru
             </Link>
             <Link href="/patient/history" className="btn-secondary flex-1 text-center">
