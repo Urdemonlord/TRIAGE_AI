@@ -11,7 +11,10 @@
       "Bash(python train_model_large.py:*)",
       "Bash(pip install:*)",
       "Bash(python test_llm_integration.py:*)",
-      "Bash(python prepare_dataset_improved.py:*)"
+      "Bash(python prepare_dataset_improved.py:*)",
+      "Bash(git add:*)",
+      "Bash(git commit:*)",
+      "Bash(git push:*)"
     ],
     "deny": [],
     "ask": []
