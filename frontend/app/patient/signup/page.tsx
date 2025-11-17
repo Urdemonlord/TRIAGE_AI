@@ -73,25 +73,9 @@ export default function PatientSignupPage() {
     setLoading(true);
 
     try {
-      await signUp(formData.email, formData.password, 'patient');
+      // signUp creates both auth user and patient record
+      await signUp(formData.email, formData.password, formData.fullName, 'patient');
       
-      // Create patient profile
-      const response = await fetch('/api/auth/register-patient', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          fullName: formData.fullName,
-          email: formData.email,
-          phone: formData.phone,
-          dateOfBirth: formData.dateOfBirth,
-          gender: formData.gender,
-        }),
-      });
-
-      if (!response.ok) {
-        throw new Error('Gagal membuat profil pasien');
-      }
-
       // Redirect to patient check page
       router.push('/patient/check');
     } catch (err: any) {

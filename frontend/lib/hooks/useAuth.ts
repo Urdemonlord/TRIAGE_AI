@@ -35,11 +35,25 @@ export function useAuth() {
     };
   }, []);
 
-  const signUp = async (email: string, password: string, role: 'patient' | 'doctor') => {
+  const signUp = async (email: string, password: string, fullName: string, role: 'patient' | 'doctor') => {
     try {
       setError(null);
       const { data, error } = await authService.signUp(email, password, role);
       if (error) throw error;
+      
+      // Create patient record if patient role
+      if (role === 'patient' && data.user) {
+        const { dbService } = await import('@/lib/supabase');
+        const { error: patientError } = await dbService.createPatient({
+          user_id: data.user.id,
+          email: email,
+          full_name: fullName,
+          created_at: new Date().toISOString(),
+          updated_at: new Date().toISOString(),
+        });
+        if (patientError) throw patientError;
+      }
+      
       return data;
     } catch (err: any) {
       setError(err.message);

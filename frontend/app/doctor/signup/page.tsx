@@ -89,7 +89,7 @@ export default function DoctorSignupPage() {
     setLoading(true);
 
     try {
-      await signUp(formData.email, formData.password, 'doctor');
+      await signUp(formData.email, formData.password, formData.fullName, 'doctor');
       
       // Create doctor profile
       const response = await fetch('/api/auth/register-doctor', {
