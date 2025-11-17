@@ -25,8 +25,8 @@ export default function Home() {
             <div className="flex items-center space-x-4">
               {!user && (
                 <>
-                  <Link href="/auth/login" className="text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white text-sm">{t.login}</Link>
-                  <Link href="/auth/register" className="text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white text-sm">{t.register}</Link>
+                  <Link href="/auth/login" className="text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white text-sm">Masuk</Link>
+                  <Link href="/patient/signup" className="text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white text-sm">Daftar</Link>
                 </>
               )}
               <LanguageSwitcher />
@@ -34,14 +34,14 @@ export default function Home() {
               {user ? (
                 <>
                   <Link href={user.user_metadata?.role === 'doctor' ? '/doctor/profile' : '/patient/profile'} className="text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white text-sm">
-                    Profile
+                    Profil
                   </Link>
                   <Link href={user.user_metadata?.role === 'doctor' ? '/doctor/dashboard' : '/patient/check-wizard'} className="btn-primary text-sm">
                     Dashboard
                   </Link>
                 </>
               ) : (
-                <Link href="/patient/check-wizard" className="btn-primary text-sm">{t.startCheck}</Link>
+                <Link href="/patient/check-wizard" className="btn-primary text-sm">Cek Gejala</Link>
               )}
             </div>          </div>
         </div>
@@ -49,6 +49,21 @@ export default function Home() {
 
       {/* Hero Section */}
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-32 pb-20">
+        {/* Quick Info Banner */}
+        <div className="mb-8 bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-700 rounded-lg p-4">
+          <div className="flex items-start">
+            <svg className="w-6 h-6 text-blue-600 dark:text-blue-400 mr-3 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
+              <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clipRule="evenodd" />
+            </svg>
+            <div>
+              <h3 className="font-semibold text-blue-900 dark:text-blue-100 mb-1">Anda TIDAK perlu daftar untuk cek gejala</h3>
+              <p className="text-sm text-blue-800 dark:text-blue-200">
+                Langsung klik "Cek Gejala Sekarang" untuk mulai. Daftar hanya jika ingin menyimpan riwayat pemeriksaan.
+              </p>
+            </div>
+          </div>
+        </div>
+
         <div className="grid md:grid-cols-2 gap-12 items-center">
           {/* Left Column */}
           <div>
@@ -66,13 +81,17 @@ export default function Home() {
             </p>
 
             <div className="flex flex-col sm:flex-row gap-4">
-              <Link href="/patient/signup" className="btn-primary text-center">
-                {t.startAsPatient}
+              <Link href="/patient/check-wizard" className="btn-primary text-center text-lg px-8 py-4">
+                🏥 Cek Gejala Sekarang
               </Link>
-              <Link href="/doctor/signup" className="btn-secondary text-center">
-                {t.startAsDoctor}
+              <Link href="/patient/signup" className="btn-secondary text-center text-lg px-8 py-4">
+                📝 Daftar Sebagai Pasien
               </Link>
             </div>
+
+            <p className="text-sm text-gray-500 dark:text-gray-400 mt-4 text-center sm:text-left">
+              Untuk tenaga medis: <Link href="/doctor/signup" className="text-primary-600 hover:underline">Daftar sebagai dokter</Link>
+            </p>
 
             {/* Stats */}
             <div className="grid grid-cols-3 gap-6 mt-12">

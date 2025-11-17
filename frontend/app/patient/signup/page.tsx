@@ -86,8 +86,8 @@ export default function PatientSignupPage() {
         }
       );
       
-      // Redirect to patient check page
-      router.push('/patient/check');
+      // Redirect to patient check-wizard page
+      router.push('/patient/check-wizard');
     } catch (err: any) {
       console.error('Signup error:', err);
       setError(err.message || 'Terjadi kesalahan saat pendaftaran');

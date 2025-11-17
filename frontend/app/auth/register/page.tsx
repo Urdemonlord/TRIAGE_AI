@@ -67,7 +67,12 @@ export default function RegisterPage() {
 
       setSuccess(true);
       setTimeout(() => {
-        router.push('/patient/check');
+        // Redirect based on role
+        if (formData.userRole === 'patient') {
+          router.push('/patient/check-wizard'); // Changed from /patient/check to wizard
+        } else {
+          router.push('/doctor/dashboard');
+        }
       }, 2000);
     } catch (err: any) {
       setError(err.message || 'Terjadi kesalahan. Silakan coba lagi.');
