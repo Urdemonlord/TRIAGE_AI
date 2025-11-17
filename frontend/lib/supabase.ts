@@ -84,17 +84,15 @@ export const authService = {
 export interface Patient {
   id: string
   user_id: string
-  email: string
+  nik: string
   full_name: string
   phone?: string
   date_of_birth?: string
-  gender?: 'male' | 'female' | 'other'
-  blood_type?: string
-  allergies?: string[]
-  chronic_conditions?: string[]
-  medications?: string[]
-  emergency_contact_name?: string
-  emergency_contact_phone?: string
+  gender?: string
+  bpjs_number?: string
+  address?: string
+  status?: string
+  last_visit?: string
   created_at: string
   updated_at: string
 }

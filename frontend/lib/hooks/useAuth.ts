@@ -46,8 +46,8 @@ export function useAuth() {
         const { dbService } = await import('@/lib/supabase');
         const { error: patientError } = await dbService.createPatient({
           user_id: data.user.id,
-          email: email,
           full_name: fullName,
+          nik: '', // Will be updated in profile
           created_at: new Date().toISOString(),
           updated_at: new Date().toISOString(),
         });

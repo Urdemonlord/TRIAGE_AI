@@ -105,8 +105,8 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       if (userRole === 'patient' && authData.user) {
         const { error: patientError } = await dbService.createPatient({
           user_id: authData.user.id,
-          email: email,
           full_name: fullName,
+          nik: '', // Will be updated in profile
           created_at: new Date().toISOString(),
           updated_at: new Date().toISOString(),
         });
