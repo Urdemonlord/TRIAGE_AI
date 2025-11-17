@@ -8,7 +8,7 @@ import DarkModeToggle from '@/components/DarkModeToggle';
 
 export default function PatientProfilePage() {
   const router = useRouter();
-  const { user, patient, loading: authLoading, updateProfile, signOut } = useAuth();
+  const { user, patient, loading: authLoading, updateProfile, signOut, refreshPatient } = useAuth();
   const [editing, setEditing] = useState(false);
   const [loading, setLoading] = useState(false);
   const [success, setSuccess] = useState('');
@@ -42,6 +42,19 @@ export default function PatientProfilePage() {
       });
     }
   }, [user, patient, authLoading, router]);
+
+  const handleRefresh = async () => {
+    setLoading(true);
+    try {
+      await refreshPatient();
+      setSuccess('Data berhasil di-refresh!');
+      setTimeout(() => setSuccess(''), 3000);
+    } catch (err) {
+      setError('Gagal refresh data');
+    } finally {
+      setLoading(false);
+    }
+  };
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) => {
     const { name, value } = e.target;
@@ -83,19 +96,54 @@ export default function PatientProfilePage() {
   if (authLoading) {
     return (
       <div className="min-h-screen bg-gradient-to-br from-primary-50 to-white dark:from-gray-900 dark:to-gray-800 flex items-center justify-center">
-        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary-600"></div>
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary-600 mx-auto mb-4"></div>
+          <p className="text-gray-600 dark:text-gray-400">Memuat data...</p>
+        </div>
       </div>
     );
   }
 
-  if (!user || !patient) {
+  if (!user) {
     return (
       <div className="min-h-screen bg-gradient-to-br from-primary-50 to-white dark:from-gray-900 dark:to-gray-800 flex items-center justify-center">
         <div className="text-center">
-          <h1 className="text-2xl font-bold text-gray-900 dark:text-white mb-4">Data Tidak Ditemukan</h1>
-          <Link href="/patient/check" className="text-primary-600 hover:text-primary-700">
-            Kembali ke Triage
+          <h1 className="text-2xl font-bold text-gray-900 dark:text-white mb-4">Silakan Login</h1>
+          <p className="text-gray-600 dark:text-gray-400 mb-6">Anda harus login untuk melihat profil</p>
+          <Link href="/auth/login" className="btn-primary">
+            Login Sekarang
           </Link>
+        </div>
+      </div>
+    );
+  }
+
+  // If user exists but no patient record, allow them to complete profile
+  if (!patient) {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-primary-50 to-white dark:from-gray-900 dark:to-gray-800 flex items-center justify-center">
+        <div className="text-center max-w-md mx-auto px-4">
+          <div className="bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-700 rounded-lg p-6 mb-6">
+            <h1 className="text-2xl font-bold text-gray-900 dark:text-white mb-2">Profil Belum Lengkap</h1>
+            <p className="text-gray-600 dark:text-gray-400 mb-4">
+              Data pasien Anda belum tersedia. Silakan lengkapi profil atau hubungi admin.
+            </p>
+            <button 
+              onClick={handleRefresh}
+              disabled={loading}
+              className="text-sm text-blue-600 dark:text-blue-400 hover:underline disabled:opacity-50"
+            >
+              {loading ? 'Memuat ulang...' : '🔄 Refresh Data'}
+            </button>
+          </div>
+          <div className="space-y-3">
+            <Link href="/patient/check-wizard" className="btn-primary block">
+              Mulai Cek Gejala
+            </Link>
+            <button onClick={handleLogout} className="btn-secondary w-full">
+              Logout
+            </button>
+          </div>
         </div>
       </div>
     );
