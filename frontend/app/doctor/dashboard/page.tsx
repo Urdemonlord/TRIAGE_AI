@@ -36,7 +36,7 @@ export default function DoctorDashboardPage() {
     if (!authLoading && user) {
       const userRole = user.user_metadata?.role;
       if (userRole !== 'doctor') {
-        router.push('/patient/check');
+        router.push('/patient/check-wizard');
         return;
       }
     }

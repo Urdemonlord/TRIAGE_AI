@@ -1,3 +1,3 @@
 // Re-export hooks for easier imports
-export { useAuth } from './useAuth';
+// useAuth is now exported from @/contexts/AuthContext
 export { useTriageSessions, useTriageSession, usePendingSessions } from './useTriage';

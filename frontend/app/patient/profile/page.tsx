@@ -154,7 +154,7 @@ export default function PatientProfilePage() {
       {/* Navigation Bar */}
       <nav className="fixed top-0 w-full bg-white/80 dark:bg-gray-900/80 backdrop-blur-lg border-b border-gray-200 dark:border-gray-700 z-50">
         <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
-          <Link href="/patient/check" className="flex items-center space-x-3">
+          <Link href="/patient/check-wizard" className="flex items-center space-x-3">
             <div className="w-10 h-10 bg-primary-600 rounded-lg flex items-center justify-center">
               <span className="text-white font-bold text-xl">T</span>
             </div>
@@ -354,7 +354,7 @@ export default function PatientProfilePage() {
           {/* Quick Links */}
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
             <Link
-              href="/patient/check"
+              href="/patient/check-wizard"
               className="p-4 bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700 hover:border-primary-500 dark:hover:border-primary-500 transition-colors text-center"
             >
               <div className="text-2xl mb-2">🩺</div>

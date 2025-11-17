@@ -130,7 +130,7 @@ export default function DoctorVerificationPage() {
 
         {/* Footer */}
         <div className="mt-8 text-center">
-          <Link href="/doctor/login" className="text-primary-600 hover:text-primary-700 text-sm">
+          <Link href="/auth/login" className="text-primary-600 hover:text-primary-700 text-sm">
             ← Kembali ke login
           </Link>
         </div>

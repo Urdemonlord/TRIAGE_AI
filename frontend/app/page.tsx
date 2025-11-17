@@ -26,7 +26,7 @@ export default function Home() {
               {!user && (
                 <>
                   <Link href="/auth/login" className="text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white text-sm">Masuk</Link>
-                  <Link href="/patient/signup" className="text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white text-sm">Daftar</Link>
+                  <Link href="/auth/register" className="text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white text-sm">Daftar</Link>
                 </>
               )}
               <LanguageSwitcher />
@@ -84,13 +84,13 @@ export default function Home() {
               <Link href="/patient/check-wizard" className="btn-primary text-center text-lg px-8 py-4">
                 🏥 Cek Gejala Sekarang
               </Link>
-              <Link href="/patient/signup" className="btn-secondary text-center text-lg px-8 py-4">
-                📝 Daftar Sebagai Pasien
+              <Link href="/auth/register" className="btn-secondary text-center text-lg px-8 py-4">
+                📝 Daftar
               </Link>
             </div>
 
             <p className="text-sm text-gray-500 dark:text-gray-400 mt-4 text-center sm:text-left">
-              Untuk tenaga medis: <Link href="/doctor/signup" className="text-primary-600 hover:underline">Daftar sebagai dokter</Link>
+              Untuk tenaga medis: <Link href="/auth/register" className="text-primary-600 hover:underline">Daftar sebagai dokter</Link>
             </p>
 
             {/* Stats */}
@@ -229,8 +229,8 @@ export default function Home() {
             <div>
               <h4 className="text-white font-semibold mb-3">Untuk Pasien</h4>
               <ul className="space-y-2 text-sm">
-                <li><Link href="/patient/signup" className="hover:text-white">Daftar Pasien</Link></li>
-                <li><Link href="/patient/login" className="hover:text-white">Masuk</Link></li>
+                <li><Link href="/auth/register" className="hover:text-white">Daftar</Link></li>
+                <li><Link href="/auth/login" className="hover:text-white">Masuk</Link></li>
                 <li><Link href="/patient/check-wizard" className="hover:text-white">Cek Gejala</Link></li>
               </ul>
             </div>
@@ -238,8 +238,8 @@ export default function Home() {
             <div>
               <h4 className="text-white font-semibold mb-3">Untuk Dokter</h4>
               <ul className="space-y-2 text-sm">
-                <li><Link href="/doctor/signup" className="hover:text-white">Daftar Dokter</Link></li>
-                <li><Link href="/doctor/login" className="hover:text-white">Masuk</Link></li>
+                <li><Link href="/auth/register" className="hover:text-white">Daftar</Link></li>
+                <li><Link href="/auth/login" className="hover:text-white">Masuk</Link></li>
               </ul>
             </div>
 

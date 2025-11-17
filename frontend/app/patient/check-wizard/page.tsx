@@ -783,7 +783,7 @@ export default function CheckWizardPage() {
 
         {/* Skip to Old Form */}
         <div className="text-center mt-6">
-          <Link href="/patient/check" className="text-sm text-gray-500 hover:text-gray-700">
+          <Link href="/patient/check-wizard" className="text-sm text-gray-500 hover:text-gray-700">
             Lebih suka form teks bebas? Klik di sini
           </Link>
         </div>
