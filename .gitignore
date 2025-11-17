@@ -107,6 +107,7 @@ dump.rdb
 DATABASE/dataset/
 DATABASE/dataset/**
 !DATABASE/createdb.sql
+!DATABASE/setup-database.sql
 
 # =============================================================================
 # DOCUMENTATION BUILDS
