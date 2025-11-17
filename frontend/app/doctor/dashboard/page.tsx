@@ -388,12 +388,12 @@ export default function DoctorDashboardPage() {
 
                     {/* Action Button */}
                     <div className="lg:w-48 flex-shrink-0">
-                      <button
-                        onClick={() => openNoteModal(triage)}
-                        className="btn-primary w-full"
+                      <Link
+                        href={`/doctor/triage/${triage.id}`}
+                        className="btn-primary w-full text-center block"
                       >
                         📝 Review & Tambah Catatan
-                      </button>
+                      </Link>
                     </div>
                   </div>
                 </div>
