@@ -35,28 +35,51 @@ export function useAuth() {
     };
   }, []);
 
-  const signUp = async (email: string, password: string, fullName: string, role: 'patient' | 'doctor') => {
+  const signUp = async (
+    email: string, 
+    password: string, 
+    fullName: string, 
+    role: 'patient' | 'doctor',
+    additionalData?: { phone?: string; dateOfBirth?: string; gender?: string }
+  ) => {
     try {
       setError(null);
       const { data, error } = await authService.signUp(email, password, role);
-      if (error) throw error;
+      if (error) {
+        console.error('Auth signup error:', error);
+        throw error;
+      }
       
       // Create patient record if patient role
       if (role === 'patient' && data.user) {
         const { dbService } = await import('@/lib/supabase');
-        const { error: patientError } = await dbService.createPatient({
+        console.log('Creating patient for user:', data.user.id, 'with fullName:', fullName);
+        
+        const patientData: any = {
           user_id: data.user.id,
           full_name: fullName,
-          nik: '', // Will be updated in profile
+          nik: '',
           created_at: new Date().toISOString(),
           updated_at: new Date().toISOString(),
-        });
-        if (patientError) throw patientError;
+        };
+
+        // Add optional fields if provided
+        if (additionalData?.phone) patientData.phone = additionalData.phone;
+        if (additionalData?.dateOfBirth) patientData.date_of_birth = additionalData.dateOfBirth;
+        if (additionalData?.gender) patientData.gender = additionalData.gender;
+
+        const { error: patientError } = await dbService.createPatient(patientData);
+        if (patientError) {
+          console.error('Patient creation error:', patientError);
+          throw new Error('Gagal membuat data pasien: ' + (patientError.message || 'Unknown error'));
+        }
+        console.log('Patient record created successfully');
       }
       
       return data;
     } catch (err: any) {
-      setError(err.message);
+      console.error('SignUp error:', err);
+      setError(err.message || 'Signup failed');
       throw err;
     }
   };

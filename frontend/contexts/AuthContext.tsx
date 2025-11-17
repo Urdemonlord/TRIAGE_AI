@@ -87,7 +87,8 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     email: string,
     password: string,
     fullName: string,
-    userRole: 'patient' | 'doctor' = 'patient'
+    userRole: 'patient' | 'doctor' = 'patient',
+    additionalData?: { phone?: string; dateOfBirth?: string; gender?: string }
   ) => {
     try {
       // 1. Create auth user
@@ -103,17 +104,24 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
       // 2. Create patient record (only for patients)
       if (userRole === 'patient' && authData.user) {
-        const { error: patientError } = await dbService.createPatient({
+        const patientData: any = {
           user_id: authData.user.id,
           full_name: fullName,
-          nik: '', // Will be updated in profile
+          nik: '',
           created_at: new Date().toISOString(),
           updated_at: new Date().toISOString(),
-        });
+        };
+
+        // Add optional fields if provided
+        if (additionalData?.phone) patientData.phone = additionalData.phone;
+        if (additionalData?.dateOfBirth) patientData.date_of_birth = additionalData.dateOfBirth;
+        if (additionalData?.gender) patientData.gender = additionalData.gender;
+
+        const { error: patientError } = await dbService.createPatient(patientData);
 
         if (patientError) {
           console.error('Error creating patient record:', patientError);
-          return { error: patientError };
+          return { error: new Error('Gagal membuat data pasien: ' + (patientError.message || 'Unknown error')) };
         }
 
         // Fetch patient data

@@ -74,7 +74,17 @@ export default function PatientSignupPage() {
 
     try {
       // signUp creates both auth user and patient record
-      await signUp(formData.email, formData.password, formData.fullName, 'patient');
+      await signUp(
+        formData.email, 
+        formData.password, 
+        formData.fullName, 
+        'patient',
+        {
+          phone: formData.phone,
+          dateOfBirth: formData.dateOfBirth,
+          gender: formData.gender
+        }
+      );
       
       // Redirect to patient check page
       router.push('/patient/check');
