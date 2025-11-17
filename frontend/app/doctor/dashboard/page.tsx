@@ -178,6 +178,9 @@ export default function DoctorDashboardPage() {
             </Link>
             <div className="flex items-center space-x-4">
               <NotificationBell />
+              <Link href="/doctor/profile" className="text-sm text-gray-600 hover:text-gray-900">
+                Profile
+              </Link>
               <div className="flex items-center space-x-2">
                 <div className="w-8 h-8 bg-blue-100 rounded-full flex items-center justify-center">
                   <svg className="w-4 h-4 text-blue-600" fill="currentColor" viewBox="0 0 20 20">

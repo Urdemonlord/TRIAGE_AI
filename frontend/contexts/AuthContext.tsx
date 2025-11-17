@@ -29,12 +29,20 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     try {
       const { data, error } = await dbService.getPatient(userId);
       if (error) {
+        // Specific error handling
+        if (error.code === 'PGRST116' || error.code === '406') {
+          // RLS policy violation or no data found - this is expected for new users
+          console.warn('Patient record not found or RLS policy blocked access:', error);
+          setPatient(null);
+          return;
+        }
         console.error('Error fetching patient data:', error);
         return;
       }
-      setPatient(data);
+      setPatient(data || null);
     } catch (error) {
       console.error('Error fetching patient data:', error);
+      setPatient(null);
     }
   };
 
@@ -45,7 +53,15 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       setUser(session?.user ?? null);
       if (session?.user) {
         fetchPatientData(session.user.id);
+      } else {
+        // Session expired or invalid - clear any stale data
+        setPatient(null);
       }
+      setLoading(false);
+    }).catch((err) => {
+      console.error('Session check failed:', err);
+      setUser(null);
+      setPatient(null);
       setLoading(false);
     });
 

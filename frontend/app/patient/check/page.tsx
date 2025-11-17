@@ -160,8 +160,20 @@ export default function PatientCheckPage() {
                 TRIAGE<span className="text-primary-600">.AI</span>
               </span>
             </Link>
-            <div className="text-sm text-gray-600">
-              <span className="font-medium">Pasien</span> - Cek Gejala
+            <div className="flex items-center space-x-4">
+              <span className="text-sm text-gray-600">
+                <span className="font-medium">Pasien</span> - Cek Gejala
+              </span>
+              {user && (
+                <>
+                  <Link href="/patient/profile" className="text-sm text-gray-600 hover:text-gray-900">
+                    Profile
+                  </Link>
+                  <Link href="/patient/history" className="text-sm text-gray-600 hover:text-gray-900">
+                    Riwayat
+                  </Link>
+                </>
+              )}
             </div>
           </div>
         </div>

@@ -3,10 +3,12 @@
 import { useEffect, useState, Suspense } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import Link from 'next/link';
+import { useAuth } from '@/contexts/AuthContext';
 import { type TriageResponse } from '@/lib/api';
 
 function ResultContent() {
   const router = useRouter();
+  const { user } = useAuth();
   const searchParams = useSearchParams();
   const [result, setResult] = useState<TriageResponse | null>(null);
   const [loading, setLoading] = useState(true);
@@ -88,8 +90,20 @@ function ResultContent() {
                 TRIAGE<span className="text-primary-600">.AI</span>
               </span>
             </Link>
-            <div className="text-sm text-gray-600">
-              <span className="font-medium">Pasien</span> - Hasil Triase
+            <div className="flex items-center space-x-4">
+              <span className="text-sm text-gray-600">
+                <span className="font-medium">Pasien</span> - Hasil Triase
+              </span>
+              {user && (
+                <>
+                  <Link href="/patient/profile" className="text-sm text-gray-600 hover:text-gray-900">
+                    Profile
+                  </Link>
+                  <Link href="/patient/history" className="text-sm text-gray-600 hover:text-gray-900">
+                    Riwayat
+                  </Link>
+                </>
+              )}
             </div>
           </div>
         </div>

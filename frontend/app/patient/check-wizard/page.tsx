@@ -297,8 +297,20 @@ export default function CheckWizardPage() {
                 TRIAGE<span className="text-primary-600">.AI</span>
               </span>
             </Link>
-            <div className="text-sm text-gray-600">
-              <span className="font-medium">Cek Gejala</span> - Step {currentStep}/4
+            <div className="flex items-center space-x-4">
+              <span className="text-sm text-gray-600">
+                <span className="font-medium">Cek Gejala</span> - Step {currentStep}/4
+              </span>
+              {user && (
+                <>
+                  <Link href="/patient/profile" className="text-sm text-gray-600 hover:text-gray-900">
+                    Profile
+                  </Link>
+                  <Link href="/patient/history" className="text-sm text-gray-600 hover:text-gray-900">
+                    Riwayat
+                  </Link>
+                </>
+              )}
             </div>
           </div>
         </div>

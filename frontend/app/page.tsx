@@ -23,14 +23,23 @@ export default function Home() {
               <span className="text-2xl font-bold text-gray-900 dark:text-white">TRIAGE<span className="text-primary-600">.AI</span></span>
             </div>
             <div className="flex items-center space-x-4">
-              <Link href="/auth/login" className="text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white text-sm">{t.login}</Link>
-              <Link href="/auth/register" className="text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white text-sm">{t.register}</Link>
+              {!user && (
+                <>
+                  <Link href="/auth/login" className="text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white text-sm">{t.login}</Link>
+                  <Link href="/auth/register" className="text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white text-sm">{t.register}</Link>
+                </>
+              )}
               <LanguageSwitcher />
               <DarkModeToggle />
               {user ? (
-                <Link href={user.user_metadata?.role === 'doctor' ? '/doctor/dashboard' : '/patient/check-wizard'} className="btn-primary text-sm">
-                  Dashboard
-                </Link>
+                <>
+                  <Link href={user.user_metadata?.role === 'doctor' ? '/doctor/profile' : '/patient/profile'} className="text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white text-sm">
+                    Profile
+                  </Link>
+                  <Link href={user.user_metadata?.role === 'doctor' ? '/doctor/dashboard' : '/patient/check-wizard'} className="btn-primary text-sm">
+                    Dashboard
+                  </Link>
+                </>
               ) : (
                 <Link href="/patient/check-wizard" className="btn-primary text-sm">{t.startCheck}</Link>
               )}
