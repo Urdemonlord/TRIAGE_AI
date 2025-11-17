@@ -107,7 +107,6 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         const patientData: any = {
           user_id: authData.user.id,
           full_name: fullName,
-          nik: '',
           created_at: new Date().toISOString(),
           updated_at: new Date().toISOString(),
         };
