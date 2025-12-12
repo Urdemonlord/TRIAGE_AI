@@ -9,7 +9,13 @@ interface AuthContextType {
   user: User | null;
   patient: Patient | null;
   loading: boolean;
-  signUp: (email: string, password: string, fullName: string, userRole: 'patient' | 'doctor') => Promise<{ error: any }>;
+  signUp: (
+    email: string,
+    password: string,
+    fullName: string,
+    userRole?: 'patient' | 'doctor',
+    additionalData?: { phone?: string; dateOfBirth?: string; gender?: string }
+  ) => Promise<{ error: any }>;
   signIn: (email: string, password: string) => Promise<{ error: any }>;
   signOut: () => Promise<void>;
   updateProfile: (updates: Partial<Patient>) => Promise<{ error: any }>;
