@@ -235,10 +235,8 @@ export default function CheckWizardPage() {
         try {
           const { data: newPatient, error: createError } = await dbService.createPatient({
             user_id: user.id,
+            email: user.email || '',
             full_name: user.user_metadata?.full_name || 'Patient',
-            nik: '',
-            created_at: new Date().toISOString(),
-            updated_at: new Date().toISOString(),
           });
 
           if (!createError && newPatient) {
