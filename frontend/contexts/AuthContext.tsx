@@ -108,12 +108,15 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         return { error: authError };
       }
 
-      // 2. If session exists, set it so authenticated requests work
+      // 2. Create authenticated Supabase client with the new session
+      let authenticatedClient = supabase;
       if (authData.session) {
-        const { error: setSessionError } = await supabase.auth.setSession(authData.session);
-        if (setSessionError) {
-          console.warn('Warning: Could not set session after signup:', setSessionError);
-        }
+        // Set the session on the global client
+        await supabase.auth.setSession(authData.session);
+        authenticatedClient = supabase;
+        
+        // Small delay to ensure session is applied
+        await new Promise(resolve => setTimeout(resolve, 100));
       }
 
       // 3. Create patient record (only for patients)
@@ -129,7 +132,14 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         if (additionalData?.dateOfBirth) patientData.date_of_birth = additionalData.dateOfBirth;
         if (additionalData?.gender) patientData.gender = additionalData.gender;
 
-        const { error: patientError } = await dbService.createPatient(patientData);
+        const { error: patientError } = await authenticatedClient
+          .from('triageai_patients')
+          .insert([patientData])
+          .select()
+          .single()
+          .then((res: any) => ({ data: res.data, error: res.error }))
+          .catch((err: any) => ({ data: null, error: err }));
+
         if (patientError) {
           console.error('Error creating patient record:', {
             error: patientError,
