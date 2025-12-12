@@ -4,6 +4,14 @@ import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { useAuth } from '@/contexts/AuthContext';
+import {
+  validateEmail,
+  validatePassword,
+  validatePasswordMatch,
+  validateName,
+  validatePhone,
+} from '@/lib/validation';
+import { getErrorMessage } from '@/lib/errors';
 
 export default function RegisterPage() {
   const router = useRouter();
@@ -11,6 +19,7 @@ export default function RegisterPage() {
   const [formData, setFormData] = useState({
     fullName: '',
     email: '',
+    phone: '',
     password: '',
     confirmPassword: '',
     userRole: 'patient' as 'patient' | 'doctor',
@@ -18,6 +27,7 @@ export default function RegisterPage() {
   });
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
+  const [fieldErrors, setFieldErrors] = useState<Record<string, string>>({});
   const [success, setSuccess] = useState(false);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
@@ -26,26 +36,48 @@ export default function RegisterPage() {
       ...prev,
       [name]: type === 'checkbox' ? (e.target as HTMLInputElement).checked : value,
     }));
+    // Clear field error when user starts typing
+    if (fieldErrors[name]) {
+      setFieldErrors((prev) => ({
+        ...prev,
+        [name]: '',
+      }));
+    }
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError('');
     setSuccess(false);
+    setFieldErrors({});
 
-    // Validation
-    if (formData.password !== formData.confirmPassword) {
-      setError('Password tidak cocok');
-      return;
-    }
+    // Validate all fields
+    const errors: Record<string, string> = {};
 
-    if (formData.password.length < 6) {
-      setError('Password minimal 6 karakter');
-      return;
-    }
+    const nameError = validateName(formData.fullName);
+    if (nameError) errors.fullName = nameError;
+
+    const emailError = validateEmail(formData.email);
+    if (emailError) errors.email = emailError;
+
+    const phoneError = validatePhone(formData.phone);
+    if (phoneError) errors.phone = phoneError;
+
+    const passwordError = validatePassword(formData.password);
+    if (passwordError) errors.password = passwordError;
+
+    const passwordMatchError = validatePasswordMatch(
+      formData.password,
+      formData.confirmPassword
+    );
+    if (passwordMatchError) errors.confirmPassword = passwordMatchError;
 
     if (!formData.agreeTerms) {
-      setError('Anda harus menyetujui syarat dan ketentuan');
+      errors.agreeTerms = 'Anda harus menyetujui syarat dan ketentuan';
+    }
+
+    if (Object.keys(errors).length > 0) {
+      setFieldErrors(errors);
       return;
     }
 
@@ -56,11 +88,15 @@ export default function RegisterPage() {
         formData.email,
         formData.password,
         formData.fullName,
-        formData.userRole
+        formData.userRole,
+        {
+          phone: formData.phone,
+        }
       );
 
       if (error) {
-        setError(error.message || 'Pendaftaran gagal. Silakan coba lagi.');
+        const errorMsg = getErrorMessage(error) || 'Pendaftaran gagal. Silakan coba lagi.';
+        setError(errorMsg);
         setLoading(false);
         return;
       }
@@ -69,13 +105,14 @@ export default function RegisterPage() {
       setTimeout(() => {
         // Redirect based on role
         if (formData.userRole === 'patient') {
-          router.push('/patient/check-wizard'); // Changed from /patient/check to wizard
+          router.push('/patient/check-wizard');
         } else {
           router.push('/doctor/dashboard');
         }
       }, 2000);
     } catch (err: any) {
-      setError(err.message || 'Terjadi kesalahan. Silakan coba lagi.');
+      const errorMsg = getErrorMessage(err) || 'Terjadi kesalahan. Silakan coba lagi.';
+      setError(errorMsg);
       setLoading(false);
     }
   };
@@ -127,11 +164,14 @@ export default function RegisterPage() {
                 name="fullName"
                 value={formData.fullName}
                 onChange={handleChange}
-                className="input-field"
+                className={`input-field ${fieldErrors.fullName ? 'border-danger-500' : ''}`}
                 placeholder="John Doe"
                 required
                 disabled={loading}
               />
+              {fieldErrors.fullName && (
+                <p className="mt-1 text-sm text-danger-600">{fieldErrors.fullName}</p>
+              )}
             </div>
 
             {/* Email */}
@@ -145,11 +185,34 @@ export default function RegisterPage() {
                 name="email"
                 value={formData.email}
                 onChange={handleChange}
-                className="input-field"
+                className={`input-field ${fieldErrors.email ? 'border-danger-500' : ''}`}
                 placeholder="nama@email.com"
                 required
                 disabled={loading}
               />
+              {fieldErrors.email && (
+                <p className="mt-1 text-sm text-danger-600">{fieldErrors.email}</p>
+              )}
+            </div>
+
+            {/* Phone (Optional) */}
+            <div>
+              <label htmlFor="phone" className="block text-sm font-medium text-gray-700 mb-2">
+                No. Telepon (Opsional)
+              </label>
+              <input
+                type="tel"
+                id="phone"
+                name="phone"
+                value={formData.phone}
+                onChange={handleChange}
+                className={`input-field ${fieldErrors.phone ? 'border-danger-500' : ''}`}
+                placeholder="08123456789"
+                disabled={loading}
+              />
+              {fieldErrors.phone && (
+                <p className="mt-1 text-sm text-danger-600">{fieldErrors.phone}</p>
+              )}
             </div>
 
             {/* User Role */}
@@ -182,13 +245,17 @@ export default function RegisterPage() {
                 name="password"
                 value={formData.password}
                 onChange={handleChange}
-                className="input-field"
+                className={`input-field ${fieldErrors.password ? 'border-danger-500' : ''}`}
                 placeholder="••••••••"
                 required
                 disabled={loading}
                 minLength={6}
               />
-              <p className="mt-1 text-xs text-gray-500">Minimal 6 karakter</p>
+              {fieldErrors.password ? (
+                <p className="mt-1 text-sm text-danger-600">{fieldErrors.password}</p>
+              ) : (
+                <p className="mt-1 text-xs text-gray-500">Minimal 6 karakter</p>
+              )}
             </div>
 
             {/* Confirm Password */}
@@ -202,39 +269,47 @@ export default function RegisterPage() {
                 name="confirmPassword"
                 value={formData.confirmPassword}
                 onChange={handleChange}
-                className="input-field"
+                className={`input-field ${fieldErrors.confirmPassword ? 'border-danger-500' : ''}`}
                 placeholder="••••••••"
                 required
                 disabled={loading}
               />
+              {fieldErrors.confirmPassword && (
+                <p className="mt-1 text-sm text-danger-600">{fieldErrors.confirmPassword}</p>
+              )}
             </div>
 
             {/* Terms Checkbox */}
-            <div className="flex items-start">
-              <div className="flex items-center h-5">
-                <input
-                  id="agreeTerms"
-                  name="agreeTerms"
-                  type="checkbox"
-                  checked={formData.agreeTerms}
-                  onChange={handleChange}
-                  className="h-4 w-4 text-primary-600 focus:ring-primary-500 border-gray-300 rounded"
-                  required
-                  disabled={loading}
-                />
+            <div>
+              <div className="flex items-start">
+                <div className="flex items-center h-5">
+                  <input
+                    id="agreeTerms"
+                    name="agreeTerms"
+                    type="checkbox"
+                    checked={formData.agreeTerms}
+                    onChange={handleChange}
+                    className="h-4 w-4 text-primary-600 focus:ring-primary-500 border-gray-300 rounded"
+                    required
+                    disabled={loading}
+                  />
+                </div>
+                <div className="ml-3 text-sm">
+                  <label htmlFor="agreeTerms" className="text-gray-700">
+                    Saya menyetujui{' '}
+                    <Link href="/terms" className="text-primary-600 hover:text-primary-700">
+                      Syarat & Ketentuan
+                    </Link>{' '}
+                    dan{' '}
+                    <Link href="/privacy" className="text-primary-600 hover:text-primary-700">
+                      Kebijakan Privasi
+                    </Link>
+                  </label>
+                </div>
               </div>
-              <div className="ml-3 text-sm">
-                <label htmlFor="agreeTerms" className="text-gray-700">
-                  Saya menyetujui{' '}
-                  <Link href="/terms" className="text-primary-600 hover:text-primary-700">
-                    Syarat & Ketentuan
-                  </Link>{' '}
-                  dan{' '}
-                  <Link href="/privacy" className="text-primary-600 hover:text-primary-700">
-                    Kebijakan Privasi
-                  </Link>
-                </label>
-              </div>
+              {fieldErrors.agreeTerms && (
+                <p className="mt-2 text-sm text-danger-600">{fieldErrors.agreeTerms}</p>
+              )}
             </div>
 
             {/* Submit Button */}

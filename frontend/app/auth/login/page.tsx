@@ -4,6 +4,8 @@ import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { useAuth } from '@/contexts/AuthContext';
+import { validateEmail, validatePassword } from '@/lib/validation';
+import { getErrorMessage } from '@/lib/errors';
 
 export default function LoginPage() {
   const router = useRouter();
@@ -12,25 +14,42 @@ export default function LoginPage() {
   const [password, setPassword] = useState('');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
+  const [fieldErrors, setFieldErrors] = useState<Record<string, string>>({});
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError('');
+    setFieldErrors({});
     setLoading(true);
+
+    // Validate inputs
+    const emailError = validateEmail(email);
+    const passwordError = validatePassword(password);
+
+    if (emailError || passwordError) {
+      setFieldErrors({
+        ...(emailError && { email: emailError }),
+        ...(passwordError && { password: passwordError }),
+      });
+      setLoading(false);
+      return;
+    }
 
     try {
       const { error } = await signIn(email, password);
 
       if (error) {
-        setError(error.message || 'Login gagal. Periksa email dan password Anda.');
+        const errorMsg = getErrorMessage(error) || 'Login gagal. Periksa email dan password Anda.';
+        setError(errorMsg);
         setLoading(false);
         return;
       }
 
-      // Redirect based on role (check from user metadata)
+      // Redirect to triage
       router.push('/patient/check-wizard');
     } catch (err: any) {
-      setError(err.message || 'Terjadi kesalahan. Silakan coba lagi.');
+      const errorMsg = getErrorMessage(err) || 'Terjadi kesalahan. Silakan coba lagi.';
+      setError(errorMsg);
       setLoading(false);
     }
   };
@@ -72,11 +91,14 @@ export default function LoginPage() {
                 id="email"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
-                className="input-field"
+                className={`input-field ${fieldErrors.email ? 'border-danger-500' : ''}`}
                 placeholder="nama@email.com"
                 required
                 disabled={loading}
               />
+              {fieldErrors.email && (
+                <p className="mt-1 text-sm text-danger-600">{fieldErrors.email}</p>
+              )}
             </div>
 
             {/* Password */}
@@ -89,11 +111,14 @@ export default function LoginPage() {
                 id="password"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
-                className="input-field"
+                className={`input-field ${fieldErrors.password ? 'border-danger-500' : ''}`}
                 placeholder="••••••••"
                 required
                 disabled={loading}
               />
+              {fieldErrors.password && (
+                <p className="mt-1 text-sm text-danger-600">{fieldErrors.password}</p>
+              )}
             </div>
 
             {/* Forgot Password Link */}
