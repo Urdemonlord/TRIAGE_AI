@@ -153,7 +153,7 @@ export const dbService = {
   // Patient operations
   async createPatient(patient: Partial<Patient>) {
     const { data, error } = await supabase
-      .from('patients')
+      .from('triageai_patients')
       .insert([patient])
       .select()
       .single()
@@ -162,7 +162,7 @@ export const dbService = {
 
   async getPatient(userId: string) {
     const { data, error } = await supabase
-      .from('patients')
+      .from('triageai_patients')
       .select('*')
       .eq('user_id', userId)
       .single()
@@ -171,7 +171,7 @@ export const dbService = {
 
   async updatePatient(userId: string, updates: Partial<Patient>) {
     const { data, error } = await supabase
-      .from('patients')
+      .from('triageai_patients')
       .update({ ...updates, updated_at: new Date().toISOString() })
       .eq('user_id', userId)
       .select()
@@ -182,7 +182,7 @@ export const dbService = {
   // Triage record operations
   async createTriageRecord(record: Partial<TriageRecord>) {
     const { data, error } = await supabase
-      .from('triage_records')
+      .from('triageai_records')
       .insert([record])
       .select()
       .single()
@@ -191,7 +191,7 @@ export const dbService = {
 
   async getTriageRecords(patientId: string, limit = 10) {
     const { data, error } = await supabase
-      .from('triage_records')
+      .from('triageai_records')
       .select('*')
       .eq('patient_id', patientId)
       .order('created_at', { ascending: false })
@@ -201,8 +201,8 @@ export const dbService = {
 
   async getTriageRecordById(id: string) {
     const { data, error } = await supabase
-      .from('triage_records')
-      .select('*, doctor_notes(*)')
+      .from('triageai_records')
+      .select('*, triageai_doctor_notes(*)')
       .eq('id', id)
       .single()
     return { data, error }
@@ -210,8 +210,8 @@ export const dbService = {
 
   async getUnreviewedTriages(urgencyLevel?: string) {
     let query = supabase
-      .from('triage_records')
-      .select('*, patients(full_name, phone)')
+      .from('triageai_records')
+      .select('*, triageai_patients(full_name, phone)')
       .eq('doctor_reviewed', false)
       .order('created_at', { ascending: false })
 
@@ -226,7 +226,7 @@ export const dbService = {
   // Doctor note operations
   async createDoctorNote(note: Partial<DoctorNote>) {
     const { data, error } = await supabase
-      .from('doctor_notes')
+      .from('triageai_doctor_notes')
       .insert([note])
       .select()
       .single()
@@ -234,7 +234,7 @@ export const dbService = {
     // Update triage record as reviewed
     if (!error && note.triage_id) {
       await supabase
-        .from('triage_records')
+        .from('triageai_records')
         .update({ doctor_reviewed: true, doctor_note_id: data.id })
         .eq('id', note.triage_id)
     }
@@ -244,7 +244,7 @@ export const dbService = {
 
   async updateDoctorNote(id: string, updates: Partial<DoctorNote>) {
     const { data, error } = await supabase
-      .from('doctor_notes')
+      .from('triageai_doctor_notes')
       .update({ ...updates, updated_at: new Date().toISOString() })
       .eq('id', id)
       .select()
@@ -254,7 +254,7 @@ export const dbService = {
 
   async getDoctorNote(triageId: string) {
     const { data, error } = await supabase
-      .from('doctor_notes')
+      .from('triageai_doctor_notes')
       .select('*')
       .eq('triage_id', triageId)
       .single()
@@ -264,7 +264,7 @@ export const dbService = {
   // Notification operations
   async createNotification(notification: Partial<Notification>) {
     const { data, error } = await supabase
-      .from('notifications')
+      .from('triageai_notifications')
       .insert([notification])
       .select()
       .single()
@@ -274,7 +274,7 @@ export const dbService = {
   async getNotifications(userId: string, userType: 'patient' | 'doctor') {
     const column = userType === 'patient' ? 'patient_id' : 'doctor_id'
     const { data, error } = await supabase
-      .from('notifications')
+      .from('triageai_notifications')
       .select('*')
       .eq(column, userId)
       .order('created_at', { ascending: false })
@@ -284,7 +284,7 @@ export const dbService = {
 
   async markNotificationAsRead(id: string) {
     const { data, error } = await supabase
-      .from('notifications')
+      .from('triageai_notifications')
       .update({ read: true })
       .eq('id', id)
       .select()
@@ -295,7 +295,7 @@ export const dbService = {
   async getUnreadCount(userId: string, userType: 'patient' | 'doctor') {
     const column = userType === 'patient' ? 'patient_id' : 'doctor_id'
     const { count, error } = await supabase
-      .from('notifications')
+      .from('triageai_notifications')
       .select('*', { count: 'exact', head: true })
       .eq(column, userId)
       .eq('read', false)
