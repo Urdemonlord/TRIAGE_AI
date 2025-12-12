@@ -2,7 +2,7 @@
 
 import React, { createContext, useContext, useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { authService, dbService, type Patient } from '@/lib/supabase';
+import { authService, dbService, supabase, type Patient } from '@/lib/supabase';
 import type { User } from '@supabase/supabase-js';
 
 interface AuthContextType {
@@ -108,7 +108,15 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         return { error: authError };
       }
 
-      // 2. Create patient record (only for patients)
+      // 2. If session exists, set it so authenticated requests work
+      if (authData.session) {
+        const { error: setSessionError } = await supabase.auth.setSession(authData.session);
+        if (setSessionError) {
+          console.warn('Warning: Could not set session after signup:', setSessionError);
+        }
+      }
+
+      // 3. Create patient record (only for patients)
       if (userRole === 'patient' && authData.user) {
         const patientData: any = {
           user_id: authData.user.id,
