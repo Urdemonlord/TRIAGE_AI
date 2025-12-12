@@ -16,12 +16,13 @@ export default function PatientProfilePage() {
 
   const [formData, setFormData] = useState({
     full_name: '',
+    email: '',
     phone: '',
     date_of_birth: '',
     gender: '',
-    nik: '',
-    bpjs_number: '',
-    address: '',
+    blood_type: '',
+    emergency_contact_name: '',
+    emergency_contact_phone: '',
   });
 
   useEffect(() => {
@@ -33,12 +34,13 @@ export default function PatientProfilePage() {
     if (patient) {
       setFormData({
         full_name: patient.full_name || '',
+        email: patient.email || '',
         phone: patient.phone || '',
         date_of_birth: patient.date_of_birth || '',
         gender: patient.gender || '',
-        nik: patient.nik || '',
-        bpjs_number: patient.bpjs_number || '',
-        address: patient.address || '',
+        blood_type: patient.blood_type || '',
+        emergency_contact_name: patient.emergency_contact_name || '',
+        emergency_contact_phone: patient.emergency_contact_phone || '',
       });
     }
   }, [user, patient, authLoading, router]);
@@ -225,17 +227,26 @@ export default function PatientProfilePage() {
                   />
                 </div>
 
-                {/* NIK */}
+                {/* Blood Type */}
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">NIK (Nomor Induk Kependudukan)</label>
-                  <input
-                    type="text"
-                    name="nik"
-                    value={formData.nik}
+                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Golongan Darah</label>
+                  <select
+                    name="blood_type"
+                    value={formData.blood_type}
                     onChange={handleChange}
                     disabled={!editing}
                     className="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent disabled:bg-gray-100 dark:disabled:bg-gray-900 disabled:cursor-not-allowed transition-colors"
-                  />
+                  >
+                    <option value="">Pilih Golongan Darah</option>
+                    <option value="A+">A+</option>
+                    <option value="A-">A-</option>
+                    <option value="B+">B+</option>
+                    <option value="B-">B-</option>
+                    <option value="AB+">AB+</option>
+                    <option value="AB-">AB-</option>
+                    <option value="O+">O+</option>
+                    <option value="O-">O-</option>
+                  </select>
                 </div>
               </div>
 
@@ -302,13 +313,13 @@ export default function PatientProfilePage() {
 
               {/* Row 4 */}
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                {/* BPJS Number */}
+                {/* Emergency Contact Name */}
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Nomor BPJS</label>
+                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Nama Kontak Darurat</label>
                   <input
                     type="text"
-                    name="bpjs_number"
-                    value={formData.bpjs_number}
+                    name="emergency_contact_name"
+                    value={formData.emergency_contact_name || ''}
                     onChange={handleChange}
                     disabled={!editing}
                     className="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent disabled:bg-gray-100 dark:disabled:bg-gray-900 disabled:cursor-not-allowed transition-colors"
@@ -316,15 +327,15 @@ export default function PatientProfilePage() {
                 </div>
               </div>
 
-              {/* Address */}
+              {/* Emergency Contact Phone */}
               <div>
-                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Alamat</label>
-                <textarea
-                  name="address"
-                  value={formData.address}
+                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Nomor Telpon Kontak Darurat</label>
+                <input
+                  type="tel"
+                  name="emergency_contact_phone"
+                  value={formData.emergency_contact_phone || ''}
                   onChange={handleChange}
                   disabled={!editing}
-                  rows={4}
                   className="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent disabled:bg-gray-100 dark:disabled:bg-gray-900 disabled:cursor-not-allowed transition-colors"
                 />
               </div>
