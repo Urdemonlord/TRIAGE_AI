@@ -114,8 +114,6 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
           user_id: authData.user.id,
           email: email,
           full_name: fullName,
-          created_at: new Date().toISOString(),
-          updated_at: new Date().toISOString(),
         };
 
         // Add optional fields if provided
@@ -124,10 +122,15 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         if (additionalData?.gender) patientData.gender = additionalData.gender;
 
         const { error: patientError } = await dbService.createPatient(patientData);
-
         if (patientError) {
-          console.error('Error creating patient record:', patientError);
-          return { error: new Error('Gagal membuat data pasien: ' + (patientError.message || 'Unknown error')) };
+          console.error('Error creating patient record:', {
+            error: patientError,
+            patientData,
+            userId: authData.user.id,
+          });
+          const errorMessage = patientError.message || 'Unknown error';
+          const detailedError = `Gagal membuat data pasien: ${errorMessage}. Silakan cek bahwa Anda terhubung ke database dengan benar.`;
+          return { error: new Error(detailedError) };
         }
 
         // Fetch patient data
