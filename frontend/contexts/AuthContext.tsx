@@ -112,6 +112,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       if (userRole === 'patient' && authData.user) {
         const patientData: any = {
           user_id: authData.user.id,
+          email: email,
           full_name: fullName,
           created_at: new Date().toISOString(),
           updated_at: new Date().toISOString(),
