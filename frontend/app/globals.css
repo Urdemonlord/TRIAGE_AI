@@ -4,55 +4,119 @@
 
 @layer base {
   body {
-    @apply bg-gray-50 text-gray-900;
+    @apply bg-gray-50 text-gray-900 transition-colors duration-300;
+  }
+  
+  /* Modern dark mode with smooth gradient */
+  .dark body {
+    @apply bg-dark-950 text-gray-100;
+    background: linear-gradient(to bottom right, #020617, #0f172a, #020617);
+    background-attachment: fixed;
+  }
+  
+  /* Smooth scrolling */
+  html {
+    scroll-behavior: smooth;
   }
 }
 
 @layer components {
+  /* Modern primary button with gradient */
   .btn-primary {
-    @apply px-6 py-3 bg-primary-600 text-white rounded-lg font-medium hover:bg-primary-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed;
+    @apply px-6 py-3 bg-gradient-to-r from-primary-600 to-primary-500 text-white rounded-lg font-medium 
+           hover:from-primary-700 hover:to-primary-600 transition-all duration-300 
+           shadow-lg hover:shadow-primary-500/50
+           disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:shadow-lg;
+  }
+  
+  .dark .btn-primary {
+    @apply from-primary-500 to-primary-600 hover:from-primary-600 hover:to-primary-700
+           shadow-primary-500/30 hover:shadow-primary-400/40;
   }
 
   .btn-secondary {
-    @apply px-6 py-3 bg-gray-200 text-gray-700 rounded-lg font-medium hover:bg-gray-300 transition-colors;
+    @apply px-6 py-3 bg-gray-200 text-gray-700 rounded-lg font-medium 
+           hover:bg-gray-300 transition-all duration-300 shadow-md hover:shadow-lg;
+  }
+  
+  .dark .btn-secondary {
+    @apply bg-dark-800 text-gray-300 hover:bg-dark-700 border border-dark-700;
   }
 
   .btn-danger {
-    @apply px-6 py-3 bg-danger-600 text-white rounded-lg font-medium hover:bg-danger-700 transition-colors;
+    @apply px-6 py-3 bg-gradient-to-r from-danger-600 to-danger-500 text-white rounded-lg font-medium 
+           hover:from-danger-700 hover:to-danger-600 transition-all duration-300
+           shadow-lg hover:shadow-danger-500/50;
+  }
+  
+  .dark .btn-danger {
+    @apply from-danger-500 to-danger-600 hover:from-danger-600 hover:to-danger-700
+           shadow-danger-500/30 hover:shadow-danger-400/40;
   }
 
+  /* Modern card with glass effect in dark mode */
   .card {
-    @apply bg-white rounded-xl shadow-sm border border-gray-200 p-6;
+    @apply bg-white rounded-xl shadow-sm border border-gray-200 p-6 transition-all duration-300;
+  }
+  
+  .dark .card {
+    @apply bg-dark-900/50 backdrop-blur-sm border-dark-800 shadow-xl;
   }
 
+  /* Modern input fields */
   .input-field {
-    @apply w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent;
+    @apply w-full px-4 py-3 border border-gray-300 rounded-lg 
+           focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent
+           transition-all duration-300 bg-white;
+  }
+  
+  .dark .input-field {
+    @apply bg-dark-900 border-dark-700 text-gray-100 
+           focus:ring-primary-400 focus:border-primary-400
+           placeholder:text-gray-500;
   }
 
   .label {
     @apply block text-sm font-medium text-gray-700 mb-2;
   }
+  
+  .dark .label {
+    @apply text-gray-300;
+  }
 
+  /* Modern urgency badges with better contrast */
   .urgency-badge {
-    @apply inline-flex items-center px-3 py-1 rounded-full text-sm font-medium;
+    @apply inline-flex items-center px-3 py-1 rounded-full text-sm font-medium shadow-sm;
   }
 
   .urgency-green {
-    @apply bg-success-100 text-success-700;
+    @apply bg-success-100 text-success-700 border border-success-200;
+  }
+  
+  .dark .urgency-green {
+    @apply bg-success-900/30 text-success-400 border-success-800;
   }
 
   .urgency-yellow {
-    @apply bg-warning-100 text-warning-700;
+    @apply bg-warning-100 text-warning-700 border border-warning-200;
+  }
+  
+  .dark .urgency-yellow {
+    @apply bg-warning-900/30 text-warning-400 border-warning-800;
   }
 
   .urgency-red {
-    @apply bg-danger-100 text-danger-700;
+    @apply bg-danger-100 text-danger-700 border border-danger-200;
+  }
+  
+  .dark .urgency-red {
+    @apply bg-danger-900/30 text-danger-400 border-danger-800;
   }
 }
 
 @layer utilities {
   .animate-fade-in {
-    animation: fadeIn 0.3s ease-in;
+    animation: fadeIn 0.5s ease-in-out;
   }
 
   .animate-slide-in {
@@ -63,6 +127,7 @@
     animation: pulse 3s cubic-bezier(0.4, 0, 0.6, 1) infinite;
   }
 
+  /* Modern skeleton with better dark mode support */
   .skeleton {
     background: linear-gradient(
       90deg,
@@ -73,19 +138,31 @@
     background-size: 1000px 100%;
     animation: shimmer 2s infinite;
   }
+  
+  .dark .skeleton {
+    background: linear-gradient(
+      90deg,
+      #1e293b 0%,
+      #334155 50%,
+      #1e293b 100%
+    );
+    background-size: 1000px 100%;
+  }
 
   @keyframes fadeIn {
     from {
       opacity: 0;
+      transform: translateY(10px);
     }
     to {
       opacity: 1;
+      transform: translateY(0);
     }
   }
 
   @keyframes slideIn {
     from {
-      transform: translateX(100%);
+      transform: translateX(-10px);
       opacity: 0;
     }
     to {
@@ -102,15 +179,14 @@
       background-position: 1000px 0;
     }
   }
+  
+  /* Glass morphism effect */
+  .glass {
+    @apply bg-white/80 backdrop-blur-md;
+  }
+  
+  .dark .glass {
+    @apply bg-dark-900/50 backdrop-blur-md border border-dark-800/50;
+  }
 }
 
-/* Dark mode skeleton */
-.dark .skeleton {
-  background: linear-gradient(
-    90deg,
-    #2a2a2a 0%,
-    #3a3a3a 50%,
-    #2a2a2a 100%
-  );
-  background-size: 1000px 100%;
-}
