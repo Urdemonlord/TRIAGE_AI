@@ -131,50 +131,79 @@ export default function DoctorTriageReviewPage() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!user || !triageRecord) return;
+    if (!user || !triageRecord) {
+      console.error('Missing user or triageRecord');
+      return;
+    }
 
     setError('');
     setSuccess('');
     setSaving(true);
 
+    console.log('🔍 Submitting doctor note...');
+    console.log('User:', user.id, user.email);
+    console.log('User role:', user.user_metadata?.role);
+    console.log('Triage ID:', triageRecord.id);
+    console.log('Form data:', formData);
+
     try {
       if (doctorNote) {
         // Update existing note
-        const { error: updateError } = await dbService.updateDoctorNote(doctorNote.id, {
+        console.log('📝 Updating existing note:', doctorNote.id);
+        const { data: updateData, error: updateError } = await dbService.updateDoctorNote(doctorNote.id, {
           ...formData,
           status: 'reviewed',
         });
 
         if (updateError) {
-          setError('Gagal memperbarui catatan dokter');
+          console.error('❌ Update error:', updateError);
+          setError(`Gagal memperbarui catatan: ${updateError.message}`);
           setSaving(false);
           return;
         }
+        
+        console.log('✅ Note updated successfully:', updateData);
       } else {
         // Create new note
-        const { error: createError } = await dbService.createDoctorNote({
+        const noteData = {
           triage_id: triageRecord.id,
           doctor_id: user.id,
           doctor_name: user.user_metadata?.full_name || user.email || 'Doctor',
-          ...formData,
+          diagnosis: formData.diagnosis,
+          notes: formData.notes || null,
+          prescription: formData.prescription || null,
+          follow_up_needed: formData.follow_up_needed || false,
+          follow_up_date: formData.follow_up_date || null,
           status: 'reviewed',
-        });
+        };
+        
+        console.log('📝 Creating new note with data:', noteData);
+        
+        const { data: createData, error: createError } = await dbService.createDoctorNote(noteData);
 
         if (createError) {
-          console.error('Error creating note:', createError);
-          setError('Gagal menyimpan catatan dokter');
+          console.error('❌ Create error:', createError);
+          console.error('Error details:', {
+            message: createError.message,
+            code: createError.code,
+            details: createError.details,
+            hint: createError.hint,
+          });
+          setError(`Gagal menyimpan catatan: ${createError.message}`);
           setSaving(false);
           return;
         }
+        
+        console.log('✅ Note created successfully:', createData);
       }
 
       setSuccess('Catatan dokter berhasil disimpan!');
       setTimeout(() => {
         router.push('/doctor/dashboard');
       }, 1500);
-    } catch (err) {
-      console.error('Error saving note:', err);
-      setError('Terjadi kesalahan saat menyimpan');
+    } catch (err: any) {
+      console.error('❌ Exception during save:', err);
+      setError(`Terjadi kesalahan: ${err.message || 'Unknown error'}`);
     } finally {
       setSaving(false);
     }
@@ -426,6 +455,30 @@ export default function DoctorTriageReviewPage() {
           {/* Right Column - Doctor Review Form */}
           <div className="lg:col-span-1">
             <div className="sticky top-24">
+              {/* Success Message */}
+              {success && (
+                <div className="mb-4 p-4 bg-success-50 dark:bg-success-900/20 border border-success-200 dark:border-success-700 rounded-lg">
+                  <div className="flex items-center gap-2">
+                    <svg className="w-5 h-5 text-success-600 dark:text-success-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                    </svg>
+                    <p className="text-sm font-medium text-success-700 dark:text-success-300">{success}</p>
+                  </div>
+                </div>
+              )}
+
+              {/* Error Message */}
+              {error && (
+                <div className="mb-4 p-4 bg-danger-50 dark:bg-danger-900/20 border border-danger-200 dark:border-danger-700 rounded-lg">
+                  <div className="flex items-center gap-2">
+                    <svg className="w-5 h-5 text-danger-600 dark:text-danger-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                    </svg>
+                    <p className="text-sm font-medium text-danger-700 dark:text-danger-300">{error}</p>
+                  </div>
+                </div>
+              )}
+
               <form onSubmit={handleSubmit} className="bg-white dark:bg-gray-800 rounded-xl shadow-lg border border-gray-200 dark:border-gray-700 p-6 space-y-4">
                 <div className="flex items-center gap-3 mb-4">
                   <div className="w-12 h-12 bg-gradient-to-br from-success-100 to-success-200 dark:from-success-900/30 dark:to-success-900/20 rounded-lg flex items-center justify-center">

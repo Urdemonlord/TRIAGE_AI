@@ -25,6 +25,7 @@ export default function Home() {
             <div className="flex items-center space-x-4">
               {!user && (
                 <>
+                  <Link href="/architecture" className="text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white text-sm">🏗️ Arsitektur</Link>
                   <Link href="/auth/login" className="text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white text-sm">Masuk</Link>
                   <Link href="/auth/register" className="text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white text-sm">Daftar</Link>
                 </>
@@ -246,6 +247,7 @@ export default function Home() {
             <div>
               <h4 className="text-white font-semibold mb-3">Lainnya</h4>
               <ul className="space-y-2 text-sm">
+                <li><Link href="/architecture" className="hover:text-white">🏗️ System Architecture</Link></li>
                 <li><Link href="/terms" className="hover:text-white">Syarat & Ketentuan</Link></li>
                 <li><Link href="/privacy" className="hover:text-white">Privasi</Link></li>
                 <li><a href="mailto:support@triageai.com" className="hover:text-white">Hubungi Kami</a></li>

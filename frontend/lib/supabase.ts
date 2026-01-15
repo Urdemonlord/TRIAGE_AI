@@ -220,7 +220,7 @@ export const dbService = {
   async getTriageRecords(patientId: string, limit = 10) {
     const { data, error } = await supabase
       .from('triageai_records')
-      .select('*')
+      .select('*, triageai_doctor_notes!triageai_doctor_notes_triage_id_fkey(*)')
       .eq('patient_id', patientId)
       .order('created_at', { ascending: false })
       .limit(limit)

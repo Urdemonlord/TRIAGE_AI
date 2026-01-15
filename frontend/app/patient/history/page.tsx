@@ -441,6 +441,47 @@ export default function PatientHistoryPage() {
                         </div>
                       )}
 
+                      {/* Doctor's Note */}
+                      {(record as any).triageai_doctor_notes && (record as any).triageai_doctor_notes.length > 0 && (
+                        <div className="mb-4 p-4 bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-lg">
+                          <div className="flex items-start gap-3">
+                            <div className="flex-shrink-0 w-10 h-10 bg-blue-100 dark:bg-blue-900/40 rounded-lg flex items-center justify-center">
+                              <svg className="w-5 h-5 text-blue-600 dark:text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+                              </svg>
+                            </div>
+                            <div className="flex-1">
+                              <h4 className="text-sm font-semibold text-blue-900 dark:text-blue-200 mb-2">
+                                Catatan dari Dr. {(record as any).triageai_doctor_notes[0].doctor_name}
+                              </h4>
+                              {(record as any).triageai_doctor_notes[0].diagnosis && (
+                                <p className="text-sm text-blue-800 dark:text-blue-300 mb-1">
+                                  <strong>Diagnosis:</strong> {(record as any).triageai_doctor_notes[0].diagnosis}
+                                </p>
+                              )}
+                              {(record as any).triageai_doctor_notes[0].notes && (
+                                <p className="text-sm text-blue-700 dark:text-blue-300 mb-1">
+                                  <strong>Catatan:</strong> {(record as any).triageai_doctor_notes[0].notes}
+                                </p>
+                              )}
+                              {(record as any).triageai_doctor_notes[0].prescription && (
+                                <p className="text-sm text-blue-700 dark:text-blue-300 mb-1">
+                                  <strong>Resep:</strong> {(record as any).triageai_doctor_notes[0].prescription}
+                                </p>
+                              )}
+                              {(record as any).triageai_doctor_notes[0].follow_up_needed && (
+                                <div className="mt-2 inline-flex items-center gap-1 px-2 py-1 bg-blue-100 dark:bg-blue-900/40 rounded text-xs font-medium text-blue-800 dark:text-blue-300">
+                                  <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                                  </svg>
+                                  Follow-up: {new Date((record as any).triageai_doctor_notes[0].follow_up_date).toLocaleDateString('id-ID')}
+                                </div>
+                              )}
+                            </div>
+                          </div>
+                        </div>
+                      )}
+
                       {/* Action Button */}
                       <div className="flex items-center justify-end">
                         <button
