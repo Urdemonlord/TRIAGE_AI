@@ -5,27 +5,49 @@ import { useRouter, useSearchParams } from 'next/navigation';
 import Link from 'next/link';
 import { useAuth } from '@/contexts/AuthContext';
 import { type TriageResponse } from '@/lib/api';
+import { dbService } from '@/lib/supabase';
 
 function ResultContent() {
   const router = useRouter();
   const { user } = useAuth();
   const searchParams = useSearchParams();
+  const triageId = searchParams.get('id');
   const [result, setResult] = useState<TriageResponse | null>(null);
+  const [doctorNote, setDoctorNote] = useState<any>(null);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    // Load result from sessionStorage
-    const storedResult = sessionStorage.getItem('triageResult');
-    if (storedResult) {
-      try {
-        const parsedResult = JSON.parse(storedResult);
-        setResult(parsedResult);
-      } catch (err) {
-        console.error('Failed to parse triage result:', err);
+    const loadData = async () => {
+      // Load result from sessionStorage
+      const storedResult = sessionStorage.getItem('triageResult');
+      if (storedResult) {
+        try {
+          const parsedResult = JSON.parse(storedResult);
+          setResult(parsedResult);
+        } catch (err) {
+          console.error('Failed to parse triage result:', err);
+        }
       }
-    }
-    setLoading(false);
-  }, []);
+
+      // Load doctor note if triageId exists
+      if (triageId) {
+        try {
+          const { data: records } = await dbService.getTriageRecords(user?.id || '', 100);
+          const record = records?.find((r: any) => r.triage_id === triageId);
+          
+          if (record && (record as any).triageai_doctor_notes && (record as any).triageai_doctor_notes.length > 0) {
+            setDoctorNote((record as any).triageai_doctor_notes[0]);
+          }
+        } catch (err) {
+          console.error('Failed to load doctor note:', err);
+        }
+      }
+      
+      setLoading(false);
+    };
+
+    loadData();
+  }, [triageId, user]);
 
   if (loading) {
     return (
@@ -354,6 +376,66 @@ function ResultContent() {
                   </div>
                 </div>
               ))}
+            </div>
+          </div>
+        )}
+
+        {/* Doctor's Note */}
+        {doctorNote && (
+          <div className="card mb-8 bg-blue-50 dark:bg-blue-900/20 border-2 border-blue-200 dark:border-blue-800">
+            <div className="flex items-start gap-4">
+              <div className="flex-shrink-0 w-12 h-12 bg-blue-100 dark:bg-blue-900/40 rounded-lg flex items-center justify-center">
+                <svg className="w-6 h-6 text-blue-600 dark:text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+                </svg>
+              </div>
+              <div className="flex-1">
+                <h3 className="text-lg font-semibold text-blue-900 dark:text-blue-200 mb-3">
+                  Catatan dari Dr. {doctorNote.doctor_name}
+                </h3>
+                
+                {doctorNote.diagnosis && (
+                  <div className="mb-3 p-3 bg-white dark:bg-blue-950/30 rounded-lg border border-blue-200 dark:border-blue-700">
+                    <p className="text-sm font-medium text-blue-900 dark:text-blue-300 mb-1">Diagnosis:</p>
+                    <p className="text-gray-800 dark:text-gray-200">{doctorNote.diagnosis}</p>
+                  </div>
+                )}
+                
+                {doctorNote.notes && (
+                  <div className="mb-3 p-3 bg-white dark:bg-blue-950/30 rounded-lg border border-blue-200 dark:border-blue-700">
+                    <p className="text-sm font-medium text-blue-900 dark:text-blue-300 mb-1">Catatan Dokter:</p>
+                    <p className="text-gray-800 dark:text-gray-200 whitespace-pre-line">{doctorNote.notes}</p>
+                  </div>
+                )}
+                
+                {doctorNote.prescription && (
+                  <div className="mb-3 p-3 bg-white dark:bg-blue-950/30 rounded-lg border border-blue-200 dark:border-blue-700">
+                    <p className="text-sm font-medium text-blue-900 dark:text-blue-300 mb-1">Resep Obat:</p>
+                    <p className="text-gray-800 dark:text-gray-200 whitespace-pre-line">{doctorNote.prescription}</p>
+                  </div>
+                )}
+                
+                {doctorNote.follow_up_needed && doctorNote.follow_up_date && (
+                  <div className="mt-3 inline-flex items-center gap-2 px-4 py-2 bg-blue-100 dark:bg-blue-900/40 rounded-lg text-sm font-medium text-blue-800 dark:text-blue-300">
+                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                    </svg>
+                    Follow-up diperlukan: {new Date(doctorNote.follow_up_date).toLocaleDateString('id-ID', { 
+                      weekday: 'long', 
+                      year: 'numeric', 
+                      month: 'long', 
+                      day: 'numeric' 
+                    })}
+                  </div>
+                )}
+                
+                <div className="mt-4 p-3 bg-blue-100 dark:bg-blue-900/30 rounded-lg border border-blue-300 dark:border-blue-700">
+                  <p className="text-xs text-blue-800 dark:text-blue-300">
+                    <strong>Catatan:</strong> Pastikan untuk mengikuti instruksi dokter dengan seksama. 
+                    Jika ada pertanyaan atau kondisi memburuk, segera hubungi dokter kembali.
+                  </p>
+                </div>
+              </div>
             </div>
           </div>
         )}
