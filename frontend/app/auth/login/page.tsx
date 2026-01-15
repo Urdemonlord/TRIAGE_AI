@@ -4,12 +4,13 @@ import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { useAuth } from '@/contexts/AuthContext';
+import { supabase } from '@/lib/supabase';
 import { validateEmail, validatePassword } from '@/lib/validation';
 import { getErrorMessage } from '@/lib/errors';
 
 export default function LoginPage() {
   const router = useRouter();
-  const { signIn } = useAuth();
+  const { signIn, user } = useAuth();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [loading, setLoading] = useState(false);
@@ -45,8 +46,16 @@ export default function LoginPage() {
         return;
       }
 
-      // Redirect to triage
-      router.push('/patient/check-wizard');
+      // Get user data to check role
+      const { data: { user: currentUser } } = await supabase.auth.getUser();
+      const userRole = currentUser?.user_metadata?.role || 'patient';
+      
+      // Redirect based on role
+      if (userRole === 'doctor') {
+        router.push('/doctor/dashboard');
+      } else {
+        router.push('/patient/check-wizard');
+      }
     } catch (err: any) {
       const errorMsg = getErrorMessage(err) || 'Terjadi kesalahan. Silakan coba lagi.';
       setError(errorMsg);

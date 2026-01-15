@@ -67,30 +67,51 @@ export function parseApiError(error: any): {
  * Handle API errors with user-friendly messages
  */
 export function getErrorMessage(error: any): string {
+  // Supabase Auth errors
+  if (error?.message) {
+    // Specific Supabase error messages
+    if (error.message.includes('Invalid login credentials')) {
+      return 'Email atau password salah';
+    }
+    if (error.message.includes('Email not confirmed')) {
+      return 'Email belum dikonfirmasi';
+    }
+    if (error.message.includes('User not found')) {
+      return 'Akun tidak ditemukan';
+    }
+    if (error.message.includes('Invalid API key')) {
+      return 'Email atau password salah';
+    }
+    // Return the original message if it's user-friendly
+    if (!error.message.includes('fetch') && !error.message.includes('network')) {
+      return error.message;
+    }
+  }
+
   // API errors
   if (error.response?.status === 401) {
-    return 'Please login first';
+    return 'Email atau password salah';
   }
 
   if (error.response?.status === 403) {
-    return 'You do not have permission to perform this action';
+    return 'Anda tidak memiliki izin';
   }
 
   if (error.response?.status === 404) {
-    return 'Resource not found';
+    return 'Data tidak ditemukan';
   }
 
   if (error.response?.status === 500) {
-    return 'Server error. Please try again later';
+    return 'Terjadi kesalahan server';
   }
 
   // Custom messages
   if (error.details?.action === 'redirect_to_signup') {
-    return 'Please complete your profile first';
+    return 'Silakan lengkapi profil Anda';
   }
 
   if (error.details?.action === 'retry_later') {
-    return 'Please try again in a moment';
+    return 'Silakan coba lagi';
   }
 
   // Parse error message

@@ -58,7 +58,11 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     authService.getSession().then((session) => {
       setUser(session?.user ?? null);
       if (session?.user) {
-        fetchPatientData(session.user.id);
+        // Only fetch patient data for patient role
+        const userRole = session.user.user_metadata?.role;
+        if (userRole === 'patient') {
+          fetchPatientData(session.user.id);
+        }
       } else {
         // Session expired or invalid - clear any stale data
         setPatient(null);
@@ -76,7 +80,11 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       async (currentUser) => {
         setUser(currentUser);
         if (currentUser) {
-          await fetchPatientData(currentUser.id);
+          // Only fetch patient data for patient role
+          const userRole = currentUser.user_metadata?.role;
+          if (userRole === 'patient') {
+            await fetchPatientData(currentUser.id);
+          }
         } else {
           setPatient(null);
         }
@@ -132,13 +140,11 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         if (additionalData?.dateOfBirth) patientData.date_of_birth = additionalData.dateOfBirth;
         if (additionalData?.gender) patientData.gender = additionalData.gender;
 
-        const { error: patientError } = await authenticatedClient
+        const { data: patientRecord, error: patientError } = await authenticatedClient
           .from('triageai_patients')
           .insert([patientData])
           .select()
-          .single()
-          .then((res: any) => ({ data: res.data, error: res.error }))
-          .catch((err: any) => ({ data: null, error: err }));
+          .single();
 
         if (patientError) {
           console.error('Error creating patient record:', {
@@ -168,13 +174,22 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         return { error };
       }
 
-      // Fetch patient data after successful sign in
+      // Update user state immediately
       if (data.user) {
-        await fetchPatientData(data.user.id);
+        setUser(data.user);
+        
+        // Only fetch patient data for patient role
+        const userRole = data.user.user_metadata?.role;
+        if (userRole === 'patient') {
+          setLoading(true);
+          await fetchPatientData(data.user.id);
+          setLoading(false);
+        }
       }
 
       return { error: null };
     } catch (error) {
+      console.error('Login exception:', error);
       return { error };
     }
   };

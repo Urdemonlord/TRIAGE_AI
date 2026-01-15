@@ -340,16 +340,16 @@ export default function DoctorTriageReviewPage() {
               <div className="grid md:grid-cols-2 gap-4">
                 <div>
                   <label className="text-sm font-medium text-gray-600 dark:text-gray-400">Nama Pasien</label>
-                  <p className="text-lg font-semibold text-gray-900 dark:text-white">{triageRecord.patients?.full_name || 'N/A'}</p>
+                  <p className="text-lg font-semibold text-gray-900 dark:text-white">{(triageRecord as any).triageai_patients?.full_name || 'N/A'}</p>
                 </div>
                 <div>
                   <label className="text-sm font-medium text-gray-600 dark:text-gray-400">Email</label>
-                  <p className="text-lg font-semibold text-gray-900 dark:text-white">{triageRecord.patients?.email || 'N/A'}</p>
+                  <p className="text-lg font-semibold text-gray-900 dark:text-white">{(triageRecord as any).triageai_patients?.email || 'N/A'}</p>
                 </div>
-                {triageRecord.patients?.phone && (
+                {(triageRecord as any).triageai_patients?.phone && (
                   <div className="md:col-span-2">
                     <label className="text-sm font-medium text-gray-600 dark:text-gray-400">Nomor Telepon</label>
-                    <p className="text-lg font-semibold text-gray-900 dark:text-white">{triageRecord.patients.phone}</p>
+                    <p className="text-lg font-semibold text-gray-900 dark:text-white">{(triageRecord as any).triageai_patients.phone}</p>
                   </div>
                 )}
               </div>

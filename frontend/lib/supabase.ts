@@ -1,29 +1,50 @@
-import { createClient } from '@supabase/supabase-js';
+import { createClient, SupabaseClient } from '@supabase/supabase-js';
 
-const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
-const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
+// Hardcoded config untuk fix Next.js 16 Turbopack env var bug
+const SUPABASE_URL = 'https://oruofaxhiigmhoiuetxc.supabase.co';
+const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im9ydW9mYXhoaWlnbWhvaXVldHhjIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTQ1NTE2MjQsImV4cCI6MjA3MDEyNzYyNH0.476KPqdM_1k4x7Lm-arLRRN11iySxNRvdCFuTYJbsrc';
 
-// Create client with fallback for build time
-let supabase: any = null;
+// Lazy initialization - client dibuat saat pertama kali dipakai
+let supabaseInstance: SupabaseClient | null = null;
 
-if (supabaseUrl && supabaseAnonKey) {
-  supabase = createClient(supabaseUrl, supabaseAnonKey);
-} else if (typeof window !== 'undefined') {
-  // Only throw error in browser, not during SSR/build
-  throw new Error(
-    'Missing Supabase environment variables. Please check your environment configuration.'
-  );
+function getSupabase() {
+  if (supabaseInstance) {
+    return supabaseInstance;
+  }
+
+  console.log('🔧 Supabase Config:', {
+    url: SUPABASE_URL,
+    hasKey: !!SUPABASE_ANON_KEY,
+    keyPreview: SUPABASE_ANON_KEY?.substring(0, 30) + '...'
+  });
+
+  if (!SUPABASE_URL || !SUPABASE_ANON_KEY) {
+    console.error('❌ Missing Supabase configuration');
+    throw new Error('Missing Supabase configuration');
+  }
+
+  // Create Supabase client with explicit options
+  supabaseInstance = createClient(SUPABASE_URL, SUPABASE_ANON_KEY, {
+    auth: {
+      autoRefreshToken: true,
+      persistSession: true,
+      detectSessionInUrl: true
+    }
+  });
+  console.log('✅ Supabase client created successfully');
+  
+  return supabaseInstance;
 }
 
-export const getSupabaseClient = () => {
-  if (!supabase && typeof window !== 'undefined') {
-    throw new Error('Supabase is not properly initialized. Missing environment variables.');
+// Export getter untuk backward compatibility
+export const supabase = new Proxy({} as SupabaseClient, {
+  get: (target, prop) => {
+    const client = getSupabase();
+    return (client as any)[prop];
   }
-  return supabase;
-};
+});
 
-// Default export for backward compatibility
-export { supabase };
+export const getSupabaseClient = getSupabase;
 
 // Auth helpers
 export const authService = {
@@ -47,6 +68,13 @@ export const authService = {
       email,
       password,
     });
+    
+    if (error) {
+      console.error('🔴 Login error:', error);
+    } else {
+      console.log('✅ Login success:', data.user?.email);
+    }
+    
     return { data, error };
   },
 
@@ -202,7 +230,7 @@ export const dbService = {
   async getTriageRecordById(id: string) {
     const { data, error } = await supabase
       .from('triageai_records')
-      .select('*, triageai_doctor_notes(*)')
+      .select('*, triageai_patients(full_name, email, phone, date_of_birth, gender, blood_type, allergies, chronic_conditions, emergency_contact_name, emergency_contact_phone), triageai_doctor_notes!triageai_doctor_notes_triage_id_fkey(*)')
       .eq('id', id)
       .single()
     return { data, error }

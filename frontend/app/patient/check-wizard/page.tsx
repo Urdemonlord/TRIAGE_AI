@@ -206,9 +206,26 @@ export default function CheckWizardPage() {
         complaint: complaintText,
       });
 
-      // Save to database only if user is logged in
-      if (user && patient) {
-        const { error: dbError } = await dbService.createTriageRecord({
+      // Check user role - only patients can save triage records
+      const userRole = user?.user_metadata?.role;
+      const isPatient = !userRole || userRole === 'patient';
+
+      console.log('🔍 Database save check:', {
+        hasUser: !!user,
+        userId: user?.id,
+        userRole: userRole,
+        isPatient: isPatient,
+        hasPatient: !!patient,
+        patientId: patient?.id,
+        patientEmail: patient?.email,
+        triageId: result.triage_id
+      });
+
+      // Save to database only if user is logged in as patient
+      if (user && patient && isPatient) {
+        console.log('💾 Attempting to save triage record...');
+        
+        const recordData = {
           patient_id: patient.id,
           triage_id: result.triage_id,
           complaint: result.original_complaint,
@@ -225,13 +242,27 @@ export default function CheckWizardPage() {
           result_json: result,
           requires_doctor_review: result.requires_doctor_review,
           doctor_reviewed: false,
-        });
+        };
+        
+        console.log('📋 Record data to save:', recordData);
+        
+        const { error: dbError } = await dbService.createTriageRecord(recordData);
 
         if (dbError) {
-          console.error('Database save error:', dbError);
+          console.error('❌ Database save error:', {
+            message: dbError.message,
+            code: dbError.code,
+            details: dbError.details,
+            hint: dbError.hint,
+            fullError: dbError
+          });
+          // Don't block user flow - show warning but continue
+          alert(`Peringatan: Hasil tidak tersimpan ke database.\nError: ${dbError.message}\nKode: ${dbError.code}\n\nAnda tetap bisa melihat hasil di bawah.`);
+        } else {
+          console.log('✅ Triage record saved successfully');
         }
-      } else if (user && !patient) {
-        // User is logged in but no patient record - try to create one
+      } else if (user && !patient && isPatient) {
+        // Patient logged in but no patient record - try to create one
         try {
           const { data: newPatient, error: createError } = await dbService.createPatient({
             user_id: user.id,
@@ -777,13 +808,6 @@ export default function CheckWizardPage() {
               )}
             </button>
           )}
-        </div>
-
-        {/* Skip to Old Form */}
-        <div className="text-center mt-6">
-          <Link href="/patient/check-wizard" className="text-sm text-gray-500 hover:text-gray-700">
-            Lebih suka form teks bebas? Klik di sini
-          </Link>
         </div>
       </div>
 
