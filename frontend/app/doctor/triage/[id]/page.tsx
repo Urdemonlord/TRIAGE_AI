@@ -170,11 +170,11 @@ export default function DoctorTriageReviewPage() {
           doctor_id: user.id,
           doctor_name: user.user_metadata?.full_name || user.email || 'Doctor',
           diagnosis: formData.diagnosis,
-          notes: formData.notes || null,
-          prescription: formData.prescription || null,
+          notes: formData.notes || undefined,
+          prescription: formData.prescription || undefined,
           follow_up_needed: formData.follow_up_needed || false,
-          follow_up_date: formData.follow_up_date || null,
-          status: 'reviewed',
+          follow_up_date: formData.follow_up_date || undefined,
+          status: 'reviewed' as const,
         };
         
         console.log('📝 Creating new note with data:', noteData);
